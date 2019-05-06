@@ -25,6 +25,17 @@
  *
  * TODO 
  * -----
+ * - Enable env_logger in actix to get nice logging
+ * - Use the CookieSessionBacked to create a cookie-based session system: 
+ *      https://actix.rs/docs/middleware/
+ * - Add a way to store user/pass for users
+ *      - On account creation, a random salt string is generated
+ *      - User's pwd is hashed using the salt, and stored alongside the salt on a file in the
+ *      pins directory
+ *      - On login, the salt is recovered, the provided pwd is hashed with it, and that hash and
+ *      the one on disk are compared
+ *      Use this function: http://bryant.github.io/argon2rs/argon2rs/fn.argon2i_simple.html
+ *
  * - Implement getting all pins
  * - Implement searching through pins
  * - Implement getting a website's title
@@ -33,7 +44,6 @@
  * - Save output of w3m alongside json data
  * - 
  * - Create per-user directories
- * - Add authentication for several users
  * - 
  */
 extern crate actix_web;
@@ -45,11 +55,13 @@ extern crate sha1;
 #[macro_use]
 extern crate failure;
 
-use actix_web::{http, server, App, State, HttpRequest, Responder, Query};
+use actix_web::{fs::NamedFile, http, server, App, State, HttpRequest, Responder, Query};
+use actix_web::middleware::Logger;
 use chrono::prelude::*;
 use failure::Error;
 use serde::{Deserialize, Serialize};
 use std::sync::mpsc;
+use std::path::PathBuf;
 
 use std::io::{self, Write};
 
@@ -206,10 +218,6 @@ impl AppState {
     }
 }
 
-fn index(req: HttpRequest<AppState>) -> impl Responder {
-    "OK"
-}
-
 #[derive(Debug, Clone, Deserialize, Serialize)]
 struct PinInfo {
     name: Option<String>,
@@ -220,6 +228,18 @@ struct PinInfo {
     unread: Option<bool>,
 }
 
+/*
+fn get_all_pins(state: State<AppState>) -> impl Responder {
+
+    let username = "jon";
+
+    if let Err(err) = state.storage.get_all_pins(username) -> Result<Vec<Pin>, Error> {
+        println!("Err: {:?}", err);
+        actix_web::dev::HttpResponseBuilder::new(actix_web::http::StatusCode::OK).finish()
+    }
+
+}
+*/
 
 fn add_pin(state: State<AppState>, pin_info: Query<PinInfo>) -> impl Responder {
 
@@ -252,13 +272,26 @@ fn add_pin(state: State<AppState>, pin_info: Query<PinInfo>) -> impl Responder {
     actix_web::dev::HttpResponseBuilder::new(actix_web::http::StatusCode::OK).finish()
 }
 
+fn index(req: HttpRequest<AppState>) -> actix_web::Result<NamedFile> {
+    Ok(NamedFile::open("static/index.html")?)
+}
+
+fn static_files(req: HttpRequest<AppState>) -> actix_web::Result<NamedFile> {
+    let path: PathBuf = req.match_info().query("path")?;
+    Ok(NamedFile::open(format!("static/{}", path.as_path().to_str().unwrap()))?)
+}
+
 fn main() {
     server::new(|| {
         let initial_state = AppState::new();
+        println!("All pins: {:?}", initial_state.storage.get_all_pins("jon"));
 
         App::<AppState>::with_state(initial_state)
-            .route("/", http::Method::GET, index)
+            .middleware(Logger::default())
+//            .route("/get_all_pins", http::Method::GET, get_all_pins)
             .route("/add_pin", http::Method::GET, add_pin)
+            .route("/", http::Method::GET, index)
+            .route("/static/{path:.*}", http::Method::GET, static_files)
     })
     .bind("127.0.0.1:8080")
     .unwrap()
