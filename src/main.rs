@@ -25,7 +25,16 @@
  *
  * TODO 
  * -----
+ * - Implement getting all pins
+ * - Implement searching through pins
+ * - Implement getting a website's title
+ *
+ * - Handle adding the same URL twice
+ * - Save output of w3m alongside json data
+ * - 
  * - Create per-user directories
+ * - Add authentication for several users
+ * - 
  */
 extern crate actix_web;
 extern crate chrono;
@@ -57,16 +66,42 @@ struct Pin {
 }
 
 impl Pin {
-    fn new_from_url(url: &str) -> Pin {
+    fn new() -> Pin {
         Pin {
-            id: sha1::Sha1::from(url).hexdigest(),
-            name: String::from(url),
-            urls: vec![String::from(url)],
+            id: sha1::Sha1::from(Utc::now().to_rfc3339()).hexdigest(),
+            name: String::from(""),
+            urls: vec![],
             description: String::new(),
             tags: vec![],
             starred: false,
             unread: true,
             created: Utc::now(),
+        }
+    }
+
+    fn id_from_url(url: &str) -> String {
+        let mut sha = sha1::Sha1::new();
+        sha.update(url.as_bytes());
+        sha.hexdigest()
+    }
+
+    fn fill_defaults(&mut self) {
+            
+        let default_pin = Pin::new();
+
+        if self.name.is_empty() {
+            if !self.urls.is_empty() {
+                self.name = self.urls[0].clone();
+            }else{
+                self.name = default_pin.name;
+            }
+        }
+        if !self.urls.is_empty() {
+            let mut sha = sha1::Sha1::new();
+            self.urls.iter().for_each(|url| sha.update(url.as_bytes()));
+            self.id = sha.hexdigest();
+        }else{
+            self.id = default_pin.id;
         }
     }
 }
@@ -88,9 +123,12 @@ impl BackingStore {
                 .arg("-dump")
                 .output()
                 .expect("Failed to run w3m");
-
-            //TODO -- check output.status
-            println!("Output: {}", String::from_utf8(output.stdout).expect("TODO -- accept non-utf8 crap"));
+       
+            let id = Pin::id_from_url(&new_url);
+            let filename = BackingStore::pin_filename("txt", "jon", &id);
+            if let Err(x) = std::fs::write(filename, &output.stdout){
+                println!("Error writing w3m output: {}", x);
+            }
         }
     }
 
@@ -101,26 +139,30 @@ impl BackingStore {
         BackingStore { in_channel }
     }
 
-    pub fn add_pin_form_url(&self, url: String) -> Result<(), Error>{
+    pub fn add_pin(&self, pin: Pin) -> Result<(), Error>{
 
-        let pin = Pin::new_from_url(&url);
+        let mut pin = pin;
+        pin.fill_defaults();
+
         let pin_json = serde_json::to_string(&pin).unwrap();
-        let filename = BackingStore::pin_filename("jon", &pin.id);
+        let filename = BackingStore::pin_filename("json", "jon", &pin.id);
         println!("Filename: {}", filename);
         std::fs::write(filename, &pin_json)?;
-        
-        self.in_channel.send(url).unwrap();
+       
+        if pin.urls.len() > 0 {
+            self.in_channel.send(pin.urls[0].clone()).unwrap();
+        }
 
         Ok(())
     }
 
-    fn pin_filename(username: &str, id: &str) -> String {
-        format!("pins/{}/{}_v0.json", username, id)
+    fn pin_filename(extension:&str, username: &str, id: &str) -> String {
+        format!("pins/{}/{}_v0.{}", username, id, extension)
     }
 
     pub fn get_pin(&self, id: String) -> Result<Pin, Error> {
         let username = "jon";
-        let filename = BackingStore::pin_filename(username, &id);
+        let filename = BackingStore::pin_filename("json", username, &id);
         self.get_pin_from_filename(&filename)
     }
 
@@ -165,20 +207,45 @@ impl AppState {
 }
 
 fn index(req: HttpRequest<AppState>) -> impl Responder {
-    req.state()
-        .storage
-        .add_pin_form_url(String::from("https://www.google.com"));
     "OK"
 }
 
-#[derive(Deserialize)]
-struct AddUrlInfo{
-    url: String,
+#[derive(Debug, Clone, Deserialize, Serialize)]
+struct PinInfo {
+    name: Option<String>,
+    url: Option<String>,
+    description: Option<String>,
+    tags: Option<String>, // %20-separated
+    starred: Option<bool>,
+    unread: Option<bool>,
 }
 
-fn add_url(state: State<AppState>, info: Query<AddUrlInfo>) -> impl Responder {
-    println!("Called");
-    if let Err(err) = state.storage.add_pin_form_url(info.url.clone()) {
+
+fn add_pin(state: State<AppState>, pin_info: Query<PinInfo>) -> impl Responder {
+
+    let pin_info = pin_info.into_inner();
+    let mut pin = Pin::new();
+
+    if let Some(name) = pin_info.name {
+        pin.name = name;
+    }
+    if let Some(url) = pin_info.url {
+        pin.urls = vec!(url);
+    }
+    if let Some(description) = pin_info.description {
+        pin.description = description;
+    }
+    if let Some(tags) = pin_info.tags {
+        pin.tags = tags.split_whitespace().filter(|x| !x.is_empty()).map(|x| String::from(x)).collect();
+    }
+    if let Some(starred) = pin_info.starred {
+        pin.starred = starred;
+    }
+    if let Some(unread) = pin_info.unread {
+        pin.unread = unread;
+    }
+
+    if let Err(err) = state.storage.add_pin(pin) {
         println!("Err: {:?}", err);
     }
 
@@ -191,7 +258,7 @@ fn main() {
 
         App::<AppState>::with_state(initial_state)
             .route("/", http::Method::GET, index)
-            .route("/add_url", http::Method::GET, add_url)
+            .route("/add_pin", http::Method::GET, add_pin)
     })
     .bind("127.0.0.1:8080")
     .unwrap()
