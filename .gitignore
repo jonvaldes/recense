@@ -1,2 +1,4 @@
 /target
+/pins
+/Cargo.lock
 **/*.rs.bk

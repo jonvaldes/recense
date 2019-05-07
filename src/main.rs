@@ -46,8 +46,10 @@
  * - Create per-user directories
  * - 
  */
+extern crate argon2rs;
 extern crate actix_web;
 extern crate chrono;
+extern crate rand_pcg;
 extern crate serde;
 extern crate serde_json;
 extern crate sha1;
@@ -63,7 +65,8 @@ use serde::{Deserialize, Serialize};
 use std::sync::mpsc;
 use std::path::PathBuf;
 
-use std::io::{self, Write};
+mod user;
+
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 struct Pin {
@@ -284,7 +287,6 @@ fn static_files(req: HttpRequest<AppState>) -> actix_web::Result<NamedFile> {
 fn main() {
     server::new(|| {
         let initial_state = AppState::new();
-        println!("All pins: {:?}", initial_state.storage.get_all_pins("jon"));
 
         App::<AppState>::with_state(initial_state)
             .middleware(Logger::default())
