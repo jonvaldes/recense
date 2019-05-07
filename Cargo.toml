@@ -8,6 +8,7 @@ edition = "2018"
 actix-web = "0.7.19"
 argon2rs = "0.2.5"
 chrono = { version = "0.4.6", features = ["serde"] }
+env_logger = "0.6.1"
 failure = "0.1.5"
 rand_pcg = "0.1.2"
 serde = { version = "1.0.90", features = ["derive"]}

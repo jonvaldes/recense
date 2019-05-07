@@ -25,16 +25,9 @@
  *
  * TODO 
  * -----
- * - Enable env_logger in actix to get nice logging
  * - Use the CookieSessionBacked to create a cookie-based session system: 
  *      https://actix.rs/docs/middleware/
- * - Add a way to store user/pass for users
- *      - On account creation, a random salt string is generated
- *      - User's pwd is hashed using the salt, and stored alongside the salt on a file in the
- *      pins directory
- *      - On login, the salt is recovered, the provided pwd is hashed with it, and that hash and
- *      the one on disk are compared
- *      Use this function: http://bryant.github.io/argon2rs/argon2rs/fn.argon2i_simple.html
+ *      See: https://github.com/actix/examples/blob/master/cookie-auth/src/main.rs
  *
  * - Implement getting all pins
  * - Implement searching through pins
@@ -46,24 +39,25 @@
  * - Create per-user directories
  * - 
  */
-extern crate argon2rs;
+
 extern crate actix_web;
+extern crate argon2rs;
 extern crate chrono;
+extern crate env_logger;
 extern crate rand_pcg;
 extern crate serde;
 extern crate serde_json;
 extern crate sha1;
 
-#[macro_use]
-extern crate failure;
+#[macro_use] extern crate failure;
 
+use actix_web::middleware::{Logger, identity::RequestIdentity};
 use actix_web::{fs::NamedFile, http, server, App, State, HttpRequest, Responder, Query};
-use actix_web::middleware::Logger;
 use chrono::prelude::*;
 use failure::Error;
 use serde::{Deserialize, Serialize};
-use std::sync::mpsc;
 use std::path::PathBuf;
+use std::sync::mpsc;
 
 mod user;
 
@@ -244,7 +238,11 @@ fn get_all_pins(state: State<AppState>) -> impl Responder {
 }
 */
 
-fn add_pin(state: State<AppState>, pin_info: Query<PinInfo>) -> impl Responder {
+fn add_pin(req: HttpRequest<AppState>, state: State<AppState>, pin_info: Query<PinInfo>) -> impl Responder {
+
+    if req.identity() == None {
+        return actix_web::HttpResponse::Forbidden().finish();
+    }
 
     let pin_info = pin_info.into_inner();
     let mut pin = Pin::new();
@@ -272,7 +270,7 @@ fn add_pin(state: State<AppState>, pin_info: Query<PinInfo>) -> impl Responder {
         println!("Err: {:?}", err);
     }
 
-    actix_web::dev::HttpResponseBuilder::new(actix_web::http::StatusCode::OK).finish()
+    actix_web::HttpResponse::Ok().finish()
 }
 
 fn index(req: HttpRequest<AppState>) -> actix_web::Result<NamedFile> {
@@ -284,15 +282,41 @@ fn static_files(req: HttpRequest<AppState>) -> actix_web::Result<NamedFile> {
     Ok(NamedFile::open(format!("static/{}", path.as_path().to_str().unwrap()))?)
 }
 
+fn login(req: HttpRequest<AppState>) -> actix_web::HttpResponse {
+    // TODO -- implement a proper login
+    req.remember("jon".to_owned());
+    actix_web::HttpResponse::Ok().finish()
+}
+
+fn logout(mut req: HttpRequest) -> actix_web::HttpResponse {
+    req.forget(); // <- remove identity
+    actix_web::HttpResponse::Ok().finish()
+}
+
+
 fn main() {
+    std::env::set_var("RUST_LOG", "actix_web=debug");
+    env_logger::init();
+
     server::new(|| {
         let initial_state = AppState::new();
 
+        use rand_pcg::rand_core::RngCore;
+        let mut cookie_key = vec![0u8; 32];
+        rand_pcg::Mcg128Xsl64::new(0x1337f00dd15ea5e5).fill_bytes(&mut cookie_key);
+
         App::<AppState>::with_state(initial_state)
             .middleware(Logger::default())
-//            .route("/get_all_pins", http::Method::GET, get_all_pins)
+            .middleware(actix_web::middleware::identity::IdentityService::new(
+                    // <- create identity middleware
+                    actix_web::middleware::identity::CookieIdentityPolicy::new(&cookie_key)
+                    .name("auth-cookie")
+                    .secure(false),
+                    ))
+            //            .route("/get_all_pins", http::Method::GET, get_all_pins)
             .route("/add_pin", http::Method::GET, add_pin)
             .route("/", http::Method::GET, index)
+            .route("/login", http::Method::GET, login) // TODO -- switch to POST
             .route("/static/{path:.*}", http::Method::GET, static_files)
     })
     .bind("127.0.0.1:8080")
