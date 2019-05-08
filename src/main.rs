@@ -1,20 +1,4 @@
 /*
- * PLAN: Bookmarking service
- * - Initially backed by a directory
- * - Each bookmark is a JSON (?) file
- * - External API:
- *      - Add bookmark: you just submit a URL
- *          - Internally downloads link, renders it with w3m, stores output
- *      - Remove bookmark
- *      - Get bookmarks: Returns all titles, URLs and peek data
- *      - Search: Searches through bookmark contents
- *
- * - Backing:
- *      - Directory with bookmarks. Each with a UUID name.
- *      <UUID>_<version>.json // Metadata
- *      <UUID>_<version>.txt // Contents
- *
- *
  * - Taking screenshots: Supposedly Firefox can take screenshots in a "headless" mode it has. I've
  * been unable to make it work, though. In theory this should be how you do that:
  *      firefox -no-remote -url https://valdes.cc/ -screenshot test.jpg
@@ -34,7 +18,6 @@
  * - Implement getting a website's title
  *
  * - Handle adding the same URL twice
- * - Save output of w3m alongside json data
  * - 
  * - Create per-user directories
  * - 
@@ -49,10 +32,11 @@ extern crate serde;
 extern crate serde_json;
 extern crate sha1;
 
+#[macro_use] extern crate log; 
 #[macro_use] extern crate failure;
 
 use actix_web::middleware::{Logger, identity::RequestIdentity};
-use actix_web::{fs::NamedFile, http, server, App, State, HttpRequest, Responder, Query};
+use actix_web::{fs::NamedFile, http, server, App, Form, State, HttpRequest, Responder, Query};
 use chrono::prelude::*;
 use failure::Error;
 use serde::{Deserialize, Serialize};
@@ -274,7 +258,11 @@ fn add_pin(req: HttpRequest<AppState>, state: State<AppState>, pin_info: Query<P
 }
 
 fn index(req: HttpRequest<AppState>) -> actix_web::Result<NamedFile> {
-    Ok(NamedFile::open("static/index.html")?)
+    if req.identity() == None {
+        Ok(NamedFile::open("static/login.html")?)
+    }else{
+        Ok(NamedFile::open("static/index.html")?)
+    }
 }
 
 fn static_files(req: HttpRequest<AppState>) -> actix_web::Result<NamedFile> {
@@ -282,20 +270,59 @@ fn static_files(req: HttpRequest<AppState>) -> actix_web::Result<NamedFile> {
     Ok(NamedFile::open(format!("static/{}", path.as_path().to_str().unwrap()))?)
 }
 
-fn login(req: HttpRequest<AppState>) -> actix_web::HttpResponse {
-    // TODO -- implement a proper login
-    req.remember("jon".to_owned());
-    actix_web::HttpResponse::Ok().finish()
+#[derive(Deserialize)]
+struct SignupInfo {
+    username: String,
+    password: String,
+    email: String,
 }
 
-fn logout(mut req: HttpRequest) -> actix_web::HttpResponse {
+fn signup(form: Form<SignupInfo>, req: HttpRequest<AppState>) -> actix_web::HttpResponse {
+    let signup_info = form.into_inner();
+
+    if let Err(x) = user::UserInfo::new_user(signup_info.username, signup_info.email, signup_info.password) {
+        error!("Error trying to create new user: {}", x);
+        actix_web::HttpResponse::InternalServerError().finish()
+    } else {
+        actix_web::HttpResponse::Ok().finish()
+    }
+}
+
+#[derive(Debug,Deserialize)]
+struct LoginInfo {
+    username: String,
+    password: String,
+}
+
+fn login(form: Form<LoginInfo>, req: HttpRequest<AppState>) -> actix_web::HttpResponse {
+    let login_info = form.into_inner();
+
+    let user = match user::UserInfo::load_user_data(&login_info.username) {
+        Err(x) => {
+            error!("Could not get user data: {:?}", login_info);
+            return actix_web::HttpResponse::Unauthorized().finish();
+        },
+        Ok(x) => x,
+    };
+
+    if user.verify_password(login_info.password) {
+        req.remember(login_info.username); // TODO -- Can we store this directly, or do we have to store a secure token?
+        actix_web::HttpResponse::Ok().finish()
+    }
+    else{
+        actix_web::HttpResponse::Unauthorized().finish()
+    }
+}
+
+fn logout(req: HttpRequest<AppState>) -> actix_web::HttpResponse {
     req.forget(); // <- remove identity
     actix_web::HttpResponse::Ok().finish()
 }
 
 
 fn main() {
-    std::env::set_var("RUST_LOG", "actix_web=debug");
+    std::env::set_var("RUST_LOG", "debug");
+    //std::env::set_var("RUST_LOG", "actix_web=debug");
     env_logger::init();
 
     server::new(|| {
@@ -303,7 +330,9 @@ fn main() {
 
         use rand_pcg::rand_core::RngCore;
         let mut cookie_key = vec![0u8; 32];
-        rand_pcg::Mcg128Xsl64::new(0x1337f00dd15ea5e5).fill_bytes(&mut cookie_key);
+
+        let timestamp = Utc::now().timestamp();
+        rand_pcg::Mcg128Xsl64::new(0x1337f00dd15ea5e5u128 + timestamp as u128).fill_bytes(&mut cookie_key);
 
         App::<AppState>::with_state(initial_state)
             .middleware(Logger::default())
@@ -316,7 +345,9 @@ fn main() {
             //            .route("/get_all_pins", http::Method::GET, get_all_pins)
             .route("/add_pin", http::Method::GET, add_pin)
             .route("/", http::Method::GET, index)
-            .route("/login", http::Method::GET, login) // TODO -- switch to POST
+            .route("/signup", http::Method::POST, signup)
+            .route("/login", http::Method::POST, login)
+            .route("/logout", http::Method::POST, logout)
             .route("/static/{path:.*}", http::Method::GET, static_files)
     })
     .bind("127.0.0.1:8080")

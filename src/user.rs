@@ -12,7 +12,7 @@ pub struct UserInfo {
 
 impl UserInfo {
 
-    fn new_user(username: String, email: String, password: String) -> Result<(), Error>{
+    pub fn new_user(username: String, email: String, password: String) -> Result<(), Error>{
 
         let mut password_salt = vec![0u8; 64];
         rand_pcg::Mcg128Xsl64::new(0xcafef00dd15ea5e5).fill_bytes(&mut password_salt);
@@ -30,35 +30,43 @@ impl UserInfo {
         // TODO - Perform password strength validation
         // TODO - Perform username String validation
         // TODO - Check username doesn't exist yet
-        
-        let filename = format!("pins/{}/userinfo.json", username);
+       
+        std::fs::create_dir_all(&UserInfo::user_dir(&username));
 
         let userinfo = UserInfo {
-            username,
+            username: username.clone(),
             email,
             hash_session: hash_session.to_u8(),
             email_validated: false,
         };
         let userinfo_json = serde_json::to_string(&userinfo).unwrap();
 
-        if let Err(x) = std::fs::write(filename, &userinfo_json){
-            // TODO - Log failure
+        if let Err(x) = std::fs::write(UserInfo::user_file(&username), &userinfo_json){
+            error!("Error trying to save user info: {}", x);
             return Err(x.into());
         }
         
         Ok(())
     }
 
-    fn load_user_data(username: String) -> Result<UserInfo, Error> {
+    fn user_dir(username: &str) -> String {
+        format!("users/{}", username)
+    }
 
-        // TODO
+    fn user_file(username: &str) -> String {
+        format!("{}/userinfo.json", UserInfo::user_dir(username))
+    }
+
+    pub fn load_user_data(username: &str) -> Result<UserInfo, Error> {
+
+        // TODO -- do the json data loading
         Err(failure::err_msg("Unimplemented"))
     }
 
-    fn verify_password(&self, password: String) -> bool {
+    pub fn verify_password(&self, password: String) -> bool {
         let hash_session = match argon2rs::verifier::Encoded::from_u8(&self.hash_session) {
             Err(x) => {
-                // TODO log hashing session error
+                error!("Error trying to reload hashing session: {}", x);
                 return false;
             }
             Ok(x) => x,

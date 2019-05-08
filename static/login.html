@@ -1,0 +1,48 @@
+<html>
+<body>
+	<div id="header">
+		<div id="logo">Pinroar</div>
+	</div>
+	<div id="main">
+
+		<div id="signup_section">
+			<h2>Sign up</h2>
+			<form action="/signup" method="POST">
+ 				<div>
+    				<label for="mail">E-mail:</label>
+    				<input type="email" id="mail" name="email">
+  				</div>
+				<div>
+    				<label for="username">Username:</label>
+    				<input type="text" id="username" name="username">
+  				</div>
+				<div>
+    				<label for="password">Password:</label>
+    				<input type="password" id="password" name="password">
+  				</div>
+				<div class="button">
+  					<button type="submit">Sign up</button>
+				</div>
+			</form>
+		</div>
+		<div id="login_section">
+			<h2>Login</h2>
+			<form action="/login" method="POST">
+				<div>
+    				<label for="username">Username:</label>
+    				<input type="text" id="username" name="username">
+  				</div>
+				<div>
+    				<label for="password">Password:</label>
+    				<input type="password" id="password" name="password">
+  				</div>
+				<div class="button">
+  					<button type="submit">Login</button>
+				</div>
+			</form>
+
+		</div>
+
+	</div>
+</body>
+</html>
