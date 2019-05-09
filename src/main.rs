@@ -9,12 +9,12 @@
  *
  * TODO 
  * -----
- * - Switch the add_pin endpoint to use form-encoded data
- * - Fix the cookie system. Identity is lost when reloading
+ * - Add live-reloading mechanism for templates
  * - Use the CookieSessionBacked to create a cookie-based session system: 
  *      https://actix.rs/docs/middleware/
  *      See: https://github.com/actix/examples/blob/master/cookie-auth/src/main.rs
  *
+ * - Integrate Handlebars to render the list of pins
  * - Implement getting all pins
  * - Implement searching through pins
  * - Implement getting a website's title
@@ -29,12 +29,13 @@ extern crate actix_web;
 extern crate argon2rs;
 extern crate chrono;
 extern crate env_logger;
-extern crate failure;
+extern crate handlebars;
 extern crate rand_pcg;
 extern crate serde;
 extern crate serde_json;
 extern crate sha1;
 
+#[macro_use] extern crate failure;
 #[macro_use] extern crate log; 
 
 use actix_web::middleware::{Logger, identity::RequestIdentity};
@@ -42,22 +43,27 @@ use actix_web::{fs::NamedFile, http, server, App, Form, State, HttpRequest, Resp
 use chrono::prelude::*;
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
+use std::io::Read;
+use std::rc::Rc;
 
 mod user;
 mod pins;
-
+mod htmlrenderer;
 use pins::*;
 
 
 #[derive(Clone)]
 struct AppState {
     storage: BackingStore,
+    html_renderer: Rc<htmlrenderer::HTMLRenderer>,
+
 }
 
 impl AppState {
     fn new() -> AppState {
         AppState {
             storage: BackingStore::new(),
+            html_renderer: Rc::new(htmlrenderer::HTMLRenderer::new()),
         }
     }
 }
@@ -105,7 +111,7 @@ fn add_pin(req: HttpRequest<AppState>, state: State<AppState>, pin_info: Form<Pi
         pin.unread = unread == "on";
     }
 
-    if let Err(err) = state.storage.add_pin(pin) {
+    if let Err(err) = state.storage.add_pin(req.identity().unwrap(), pin) {
         error!("Err: {:?}", err);
     }
 
@@ -128,12 +134,25 @@ fn get_all_pins(state: State<AppState>) -> impl Responder {
 }
 */
 
-fn index(req: HttpRequest<AppState>) -> actix_web::Result<NamedFile> {
-    if req.identity() == None {
-        Ok(NamedFile::open("static/login.html")?)
-    }else{
-        Ok(NamedFile::open("static/index.html")?)
-    }
+
+fn index(req: HttpRequest<AppState>) -> actix_web::HttpResponse  {
+    use std::borrow::Borrow;
+    let renderer : &htmlrenderer::HTMLRenderer = req.state().html_renderer.borrow();
+
+    let page_name = if req.identity() == None {
+            "login"
+        }else{
+            "index"
+        };
+
+    let contents = match renderer.render_page(page_name) {
+        Err(x) => return actix_web::HttpResponse::InternalServerError().finish(),
+        Ok(x) => x,
+    };
+
+    actix_web::HttpResponse::Ok()
+        .content_type("text/html")
+        .body(contents)
 }
 
 fn static_files(req: HttpRequest<AppState>) -> actix_web::Result<NamedFile> {
@@ -197,7 +216,7 @@ fn logout(req: HttpRequest<AppState>) -> actix_web::HttpResponse {
 
 fn main() {
     //std::env::set_var("RUST_LOG", "debug");
-    std::env::set_var("RUST_LOG", "pinroar=debug,actix_web=debug");
+    std::env::set_var("RUST_LOG", "pinroar=debug,actix_web=debug,handlebars=debug");
     env_logger::init();
 
 

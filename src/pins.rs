@@ -56,26 +56,31 @@ impl Pin {
     }
 }
 
+struct DownloadRequest {
+    url: String,
+    username: String,
+}
+
 #[derive(Clone)]
 pub struct BackingStore {
-    in_channel: mpsc::Sender<String>,
+    in_channel: mpsc::Sender<DownloadRequest>,
 }
 
 impl BackingStore {
-    fn downloader_thread(channel: mpsc::Receiver<String>) {
+    fn downloader_thread(channel: mpsc::Receiver<DownloadRequest>) {
         loop {
-            let new_url = channel.recv().unwrap();
+            let download_request = channel.recv().unwrap();
 
-            println!("Getting url: {}", new_url);
+            println!("Getting url: {}", download_request.url);
 
             let output = std::process::Command::new("w3m")
-                .arg(&new_url)
+                .arg(&download_request.url)
                 .arg("-dump")
                 .output()
                 .expect("Failed to run w3m");
        
-            let id = Pin::id_from_url(&new_url);
-            let filename = BackingStore::pin_filename("txt", "jon", &id);
+            let id = Pin::id_from_url(&download_request.url);
+            let filename = BackingStore::pin_filename("txt", &download_request.username, &id);
             if let Err(x) = std::fs::write(filename, &output.stdout){
                 println!("Error writing w3m output: {}", x);
             }
@@ -89,18 +94,18 @@ impl BackingStore {
         BackingStore { in_channel }
     }
 
-    pub fn add_pin(&self, pin: Pin) -> Result<(), Error>{
+    pub fn add_pin(&self, username: String, pin: Pin) -> Result<(), Error>{
 
         let mut pin = pin;
         pin.fill_defaults();
 
         let pin_json = serde_json::to_string(&pin).unwrap();
-        let filename = BackingStore::pin_filename("json", "jon", &pin.id);
+        let filename = BackingStore::pin_filename("json", &username, &pin.id);
         println!("Filename: {}", filename);
         std::fs::write(filename, &pin_json)?;
        
         if pin.urls.len() > 0 {
-            self.in_channel.send(pin.urls[0].clone()).unwrap();
+            self.in_channel.send(DownloadRequest{url: pin.urls[0].clone(), username}).unwrap();
         }
 
         Ok(())
@@ -110,9 +115,8 @@ impl BackingStore {
         format!("pins/{}/{}_v0.{}", username, id, extension)
     }
 
-    pub fn get_pin(&self, id: String) -> Result<Pin, Error> {
-        let username = "jon";
-        let filename = BackingStore::pin_filename("json", username, &id);
+    pub fn get_pin(&self, username: String, id: String) -> Result<Pin, Error> {
+        let filename = BackingStore::pin_filename("json", &username, &id);
         self.get_pin_from_filename(&filename)
     }
 
