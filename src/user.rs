@@ -15,7 +15,10 @@ impl UserInfo {
     pub fn new_user(username: String, email: String, password: String) -> Result<(), Error>{
 
         let mut password_salt = vec![0u8; 64];
-        rand_pcg::Mcg128Xsl64::new(0xcafef00dd15ea5e5).fill_bytes(&mut password_salt);
+        use chrono::prelude::*;
+        let timestamp = Utc::now().timestamp_nanos();
+
+        rand_pcg::Mcg128Xsl64::new(0xcafef00dd15ea5e5 + timestamp as u128).fill_bytes(&mut password_salt);
 
         let hash_session = argon2rs::verifier::Encoded::new(
             argon2rs::Argon2::default(argon2rs::Variant::Argon2i),
@@ -31,7 +34,7 @@ impl UserInfo {
         // TODO - Perform username String validation
         // TODO - Check username doesn't exist yet
        
-        std::fs::create_dir_all(&UserInfo::user_dir(&username));
+        std::fs::create_dir_all(&UserInfo::user_dir(&username))?;
 
         let userinfo = UserInfo {
             username: username.clone(),
@@ -58,9 +61,8 @@ impl UserInfo {
     }
 
     pub fn load_user_data(username: &str) -> Result<UserInfo, Error> {
-
-        // TODO -- do the json data loading
-        Err(failure::err_msg("Unimplemented"))
+        let json_data = std::fs::read_to_string(&std::path::Path::new(&UserInfo::user_file(username)))?;
+        Ok(serde_json::from_str(&json_data)?)
     }
 
     pub fn verify_password(&self, password: String) -> bool {

@@ -6,7 +6,27 @@
 		<a href="#">Add Pin</a>
 
 		<textarea rows=1 placeholder="Search..."></textarea>
-		<a href="#">Logout</a>
+		<form action="/logout" method="POST">
+  			<button type="submit">Logout</button>
+		</form>
 	</div>
+
+	<div id="add_pin_panel">
+		<form action="/add_pin" method="POST">
+			<input type="text" name="title" placeholder="Title...">
+			<input type="text" name="url" placeholder="Url...">
+			<input type="text" name="description" placeholder="Description...">
+			<input type="text" name="tags" placeholder="Tags...">
+		
+			<input type="checkbox" name="starred">
+ 			<label for="starred">Star</label>
+
+			<input type="checkbox" name="unread">
+ 			<label for="unread">To Read</label>
+  			<button type="submit">Add Pin</button>
+		</form>
+	</div>
+
+
 </body>
 </html>
