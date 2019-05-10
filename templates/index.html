@@ -4,15 +4,16 @@
 		<link rel="stylesheet" type="text/css" href="/static/style.css">
 	</head>
 	<div id="header">
-		<div id="logo">Pinroar</div>
+		<h2>Pinroar</h2>
 
-		<a href="#">Add Pin</a>
+		<a onclick="document.getElementById('add_pin_panel').style.display = 'block'">Add Pin</a>
 
 		<textarea rows=1 placeholder="Search..."></textarea>
-		<form action="/logout" method="POST">
+		<form id="logout_form" action="/logout" method="POST">
   			<button type="submit">Logout {{username}}</button>
 		</form>
 	</div>
+
 
 	<div id="add_pin_panel">
 		<form action="/add_pin" method="POST">

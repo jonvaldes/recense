@@ -9,19 +9,10 @@
  *
  * TODO
  * -----
- * - Add live-reloading mechanism for templates
- * - Use the CookieSessionBacked to create a cookie-based session system:
- *      https://actix.rs/docs/middleware/
- *      See: https://github.com/actix/examples/blob/master/cookie-auth/src/main.rs
- *
- * - Integrate Handlebars to render the list of pins
- * - Implement getting all pins
+  *
  * - Implement searching through pins
  * - Implement getting a website's title
- *
  * - Handle adding the same URL twice
- * -
- * - Create per-user directories
  * -
  */
 

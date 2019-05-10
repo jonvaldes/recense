@@ -1,3 +1,41 @@
+@font-face {
+    font-family: "GlacialIndifference";
+    src: url("/static/fonts/GlacialIndifference-Regular.otf") format("opentype");
+}
+
+body {
+	font-family: "GlacialIndifference";/*, sans-serif;*/
+	font-size: large;
+}
+
+h2 {
+	display: inline-block;
+}
+
+#logout_form {
+	display: inline-block;
+}
+
+input, textarea, button {
+	color: #000;
+	background-color: #fff;
+	border-color: #777;
+	border-radius:2px;
+}
+
+button {
+	background-color: #eee;
+}
+
+.header {
+	display:flex;
+	flex-direction: row;
+}
+	
+#add_pin_panel{
+	display: none;
+}
+
 .pin_container {
 	display: flex;
 	flex-direction: column;
@@ -10,3 +48,5 @@
 	box-shadow: 2px 2px 4px 2px #aaa;
 	margin: 0.5em;
 }
+
+
