@@ -7,10 +7,10 @@
  *      See: https://developer.mozilla.org/en-US/docs/Mozilla/Firefox/Headless_mode
  *
  *
- * TODO 
+ * TODO
  * -----
  * - Add live-reloading mechanism for templates
- * - Use the CookieSessionBacked to create a cookie-based session system: 
+ * - Use the CookieSessionBacked to create a cookie-based session system:
  *      https://actix.rs/docs/middleware/
  *      See: https://github.com/actix/examples/blob/master/cookie-auth/src/main.rs
  *
@@ -20,9 +20,9 @@
  * - Implement getting a website's title
  *
  * - Handle adding the same URL twice
- * - 
+ * -
  * - Create per-user directories
- * - 
+ * -
  */
 
 extern crate actix_web;
@@ -35,27 +35,27 @@ extern crate rand_pcg;
 extern crate serde;
 extern crate sha1;
 
-#[macro_use] extern crate serde_json;
-#[macro_use] extern crate log; 
+#[macro_use]
+extern crate serde_json;
+#[macro_use]
+extern crate log;
 
-use actix_web::middleware::{Logger, identity::RequestIdentity};
-use actix_web::{fs::NamedFile, http, server, App, Form, State, HttpRequest, Responder};
+use actix_web::middleware::{identity::RequestIdentity, Logger};
+use actix_web::{fs::NamedFile, http, server, App, Form, HttpRequest, Responder, State};
 use chrono::prelude::*;
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 use std::rc::Rc;
 
-mod user;
-mod pins;
 mod htmlrenderer;
+mod pins;
+mod user;
 use pins::*;
-
 
 #[derive(Clone)]
 struct AppState {
     storage: BackingStore,
     html_renderer: Rc<htmlrenderer::HTMLRenderer>,
-
 }
 
 impl AppState {
@@ -67,7 +67,6 @@ impl AppState {
     }
 }
 
-
 #[derive(Debug, Clone, Deserialize, Serialize)]
 struct PinInfo {
     title: Option<String>,
@@ -78,8 +77,11 @@ struct PinInfo {
     unread: Option<String>,
 }
 
-fn add_pin(req: HttpRequest<AppState>, state: State<AppState>, pin_info: Form<PinInfo>) -> impl Responder {
-
+fn add_pin(
+    req: HttpRequest<AppState>,
+    state: State<AppState>,
+    pin_info: Form<PinInfo>,
+) -> impl Responder {
     println!("got to add_pin");
 
     if req.identity() == None {
@@ -95,13 +97,17 @@ fn add_pin(req: HttpRequest<AppState>, state: State<AppState>, pin_info: Form<Pi
         pin.title = title;
     }
     if let Some(url) = pin_info.url {
-        pin.urls = vec!(url);
+        pin.urls = vec![url];
     }
     if let Some(description) = pin_info.description {
         pin.description = description;
     }
     if let Some(tags) = pin_info.tags {
-        pin.tags = tags.split_whitespace().filter(|x| !x.is_empty()).map(|x| String::from(x)).collect();
+        pin.tags = tags
+            .split_whitespace()
+            .filter(|x| !x.is_empty())
+            .map(|x| String::from(x))
+            .collect();
     }
     if let Some(starred) = pin_info.starred {
         pin.starred = starred == "on";
@@ -115,9 +121,8 @@ fn add_pin(req: HttpRequest<AppState>, state: State<AppState>, pin_info: Form<Pi
     }
 
     actix_web::HttpResponse::SeeOther()
-            .header(actix_web::http::header::LOCATION, "/")
-            .finish()
-
+        .header(actix_web::http::header::LOCATION, "/")
+        .finish()
 }
 
 /*
@@ -134,9 +139,8 @@ fn get_all_pins(state: State<AppState>) -> impl Responder {
 */
 
 fn login_screen(state: &AppState) -> actix_web::HttpResponse {
-
     use std::borrow::Borrow;
-    let renderer : &htmlrenderer::HTMLRenderer = state.html_renderer.borrow();
+    let renderer: &htmlrenderer::HTMLRenderer = state.html_renderer.borrow();
 
     let mut data = std::collections::HashMap::new();
     data.insert(String::from("dummy"), String::from("dummy"));
@@ -151,7 +155,7 @@ fn login_screen(state: &AppState) -> actix_web::HttpResponse {
         .body(contents)
 }
 
-fn index(req: HttpRequest<AppState>) -> actix_web::HttpResponse  {
+fn index(req: HttpRequest<AppState>) -> actix_web::HttpResponse {
     let username = req.identity().unwrap_or(String::new());
 
     if username == "" {
@@ -159,16 +163,16 @@ fn index(req: HttpRequest<AppState>) -> actix_web::HttpResponse  {
     }
 
     use std::borrow::Borrow;
-    let renderer : &htmlrenderer::HTMLRenderer = req.state().html_renderer.borrow();
+    let renderer: &htmlrenderer::HTMLRenderer = req.state().html_renderer.borrow();
 
     let pins = match req.state().storage.get_all_pins(&username) {
-       Err(err) => {
+        Err(err) => {
             println!("Err: {:?}", err);
-            return actix_web::dev::HttpResponseBuilder::new(actix_web::http::StatusCode::OK).finish();
-       },
-       Ok(x) => x,
+            return actix_web::dev::HttpResponseBuilder::new(actix_web::http::StatusCode::OK)
+                .finish();
+        }
+        Ok(x) => x,
     };
-
 
     let index_data = json!({
         "username": username.clone(),
@@ -187,7 +191,10 @@ fn index(req: HttpRequest<AppState>) -> actix_web::HttpResponse  {
 
 fn static_files(req: HttpRequest<AppState>) -> actix_web::Result<NamedFile> {
     let path: PathBuf = req.match_info().query("path")?;
-    Ok(NamedFile::open(format!("static/{}", path.as_path().to_str().unwrap()))?)
+    Ok(NamedFile::open(format!(
+        "static/{}",
+        path.as_path().to_str().unwrap()
+    ))?)
 }
 
 #[derive(Deserialize)]
@@ -200,7 +207,11 @@ struct SignupInfo {
 fn signup(form: Form<SignupInfo>) -> actix_web::HttpResponse {
     let signup_info = form.into_inner();
 
-    if let Err(x) = user::UserInfo::new_user(signup_info.username, signup_info.email, signup_info.password) {
+    if let Err(x) = user::UserInfo::new_user(
+        signup_info.username,
+        signup_info.email,
+        signup_info.password,
+    ) {
         error!("Error trying to create new user: {}", x);
         actix_web::HttpResponse::InternalServerError().finish()
     } else {
@@ -208,7 +219,7 @@ fn signup(form: Form<SignupInfo>) -> actix_web::HttpResponse {
     }
 }
 
-#[derive(Debug,Deserialize)]
+#[derive(Debug, Deserialize)]
 struct LoginInfo {
     username: String,
     password: String,
@@ -221,7 +232,7 @@ fn login(form: Form<LoginInfo>, req: HttpRequest<AppState>) -> actix_web::HttpRe
         Err(x) => {
             error!("Could not get user data: {:?}. Error: {:?}", login_info, x);
             return actix_web::HttpResponse::Unauthorized().finish();
-        },
+        }
         Ok(x) => x,
     };
 
@@ -230,8 +241,7 @@ fn login(form: Form<LoginInfo>, req: HttpRequest<AppState>) -> actix_web::HttpRe
         actix_web::HttpResponse::SeeOther()
             .header(actix_web::http::header::LOCATION, "/")
             .finish()
-    }
-    else{
+    } else {
         actix_web::HttpResponse::Unauthorized().finish()
     }
 }
@@ -239,8 +249,8 @@ fn login(form: Form<LoginInfo>, req: HttpRequest<AppState>) -> actix_web::HttpRe
 fn logout(req: HttpRequest<AppState>) -> actix_web::HttpResponse {
     req.forget(); // <- remove identity
     actix_web::HttpResponse::SeeOther()
-            .header(actix_web::http::header::LOCATION, "/")
-            .finish()
+        .header(actix_web::http::header::LOCATION, "/")
+        .finish()
 }
 
 fn main() {
@@ -248,27 +258,27 @@ fn main() {
     std::env::set_var("RUST_LOG", "pinroar=debug,actix_web=debug,handlebars=debug");
     env_logger::init();
 
-
     let cookie_key = {
         use rand_pcg::rand_core::RngCore;
         let mut cookie_key = vec![0u8; 32];
 
         let timestamp = Utc::now().timestamp_nanos();
-        rand_pcg::Mcg128Xsl64::new(0x1337f00dd15ea5e5u128 + timestamp as u128).fill_bytes(&mut cookie_key);
+        rand_pcg::Mcg128Xsl64::new(0x1337f00dd15ea5e5u128 + timestamp as u128)
+            .fill_bytes(&mut cookie_key);
         cookie_key
     };
 
-    server::new(move|| {
+    server::new(move || {
         let initial_state = AppState::new();
 
         App::<AppState>::with_state(initial_state)
             .middleware(Logger::default())
             .middleware(actix_web::middleware::identity::IdentityService::new(
-                    // <- create identity middleware
-                    actix_web::middleware::identity::CookieIdentityPolicy::new(&cookie_key)
+                // <- create identity middleware
+                actix_web::middleware::identity::CookieIdentityPolicy::new(&cookie_key)
                     .name("auth-cookie")
                     .secure(false),
-                    ))
+            ))
             //            .route("/get_all_pins", http::Method::GET, get_all_pins)
             .route("/", http::Method::GET, index)
             .route("/static/{path:.*}", http::Method::GET, static_files)

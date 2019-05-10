@@ -36,13 +36,12 @@ impl Pin {
     }
 
     pub fn fill_defaults(&mut self) {
-            
         let default_pin = Pin::new();
 
         if self.title.is_empty() {
             if !self.urls.is_empty() {
                 self.title = self.urls[0].clone();
-            }else{
+            } else {
                 self.title = default_pin.title;
             }
         }
@@ -50,7 +49,7 @@ impl Pin {
             let mut sha = sha1::Sha1::new();
             self.urls.iter().for_each(|url| sha.update(url.as_bytes()));
             self.id = sha.hexdigest();
-        }else{
+        } else {
             self.id = default_pin.id;
         }
     }
@@ -78,10 +77,10 @@ impl BackingStore {
                 .arg("-dump")
                 .output()
                 .expect("Failed to run w3m");
-       
+
             let id = Pin::id_from_url(&download_request.url);
             let filename = BackingStore::pin_filename("txt", &download_request.username, &id);
-            if let Err(x) = std::fs::write(filename, &output.stdout){
+            if let Err(x) = std::fs::write(filename, &output.stdout) {
                 println!("Error writing w3m output: {}", x);
             }
         }
@@ -94,8 +93,7 @@ impl BackingStore {
         BackingStore { in_channel }
     }
 
-    pub fn add_pin(&self, username: String, pin: Pin) -> Result<(), Error>{
-
+    pub fn add_pin(&self, username: String, pin: Pin) -> Result<(), Error> {
         let mut pin = pin;
         pin.fill_defaults();
 
@@ -106,15 +104,20 @@ impl BackingStore {
 
         println!("Filename: {}", filename);
         std::fs::write(filename, &pin_json)?;
-       
+
         if pin.urls.len() > 0 {
-            self.in_channel.send(DownloadRequest{url: pin.urls[0].clone(), username}).unwrap();
+            self.in_channel
+                .send(DownloadRequest {
+                    url: pin.urls[0].clone(),
+                    username,
+                })
+                .unwrap();
         }
 
         Ok(())
     }
 
-    fn pin_filename(extension:&str, username: &str, id: &str) -> String {
+    fn pin_filename(extension: &str, username: &str, id: &str) -> String {
         format!("pins/{}/{}_v0.{}", username, id, extension)
     }
 
@@ -137,7 +140,7 @@ impl BackingStore {
         let dir_path = std::path::Path::new(&path_str);
 
         if !dir_path.exists() {
-            return Ok(vec!());
+            return Ok(vec![]);
         }
 
         std::fs::read_dir(dir_path)?
@@ -160,4 +163,3 @@ impl BackingStore {
             .collect()
     }
 }
-

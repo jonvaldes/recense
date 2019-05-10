@@ -1,6 +1,6 @@
 use failure::Error;
-use serde::{Deserialize, Serialize};
 use rand_pcg::rand_core::RngCore;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
 pub struct UserInfo {
@@ -11,18 +11,17 @@ pub struct UserInfo {
 }
 
 impl UserInfo {
-
-    pub fn new_user(username: String, email: String, password: String) -> Result<(), Error>{
-
+    pub fn new_user(username: String, email: String, password: String) -> Result<(), Error> {
         let mut password_salt = vec![0u8; 64];
         use chrono::prelude::*;
         let timestamp = Utc::now().timestamp_nanos();
 
-        rand_pcg::Mcg128Xsl64::new(0xcafef00dd15ea5e5 + timestamp as u128).fill_bytes(&mut password_salt);
+        rand_pcg::Mcg128Xsl64::new(0xcafef00dd15ea5e5 + timestamp as u128)
+            .fill_bytes(&mut password_salt);
 
         let hash_session = argon2rs::verifier::Encoded::new(
             argon2rs::Argon2::default(argon2rs::Variant::Argon2i),
-            password.as_bytes(), 
+            password.as_bytes(),
             &password_salt,
             &[],
             &[],
@@ -33,7 +32,7 @@ impl UserInfo {
         // TODO - Perform password strength validation
         // TODO - Perform username String validation
         // TODO - Check username doesn't exist yet
-       
+
         std::fs::create_dir_all(&UserInfo::user_dir(&username))?;
 
         let userinfo = UserInfo {
@@ -44,11 +43,11 @@ impl UserInfo {
         };
         let userinfo_json = serde_json::to_string(&userinfo).unwrap();
 
-        if let Err(x) = std::fs::write(UserInfo::user_file(&username), &userinfo_json){
+        if let Err(x) = std::fs::write(UserInfo::user_file(&username), &userinfo_json) {
             error!("Error trying to save user info: {}", x);
             return Err(x.into());
         }
-        
+
         Ok(())
     }
 
@@ -61,7 +60,8 @@ impl UserInfo {
     }
 
     pub fn load_user_data(username: &str) -> Result<UserInfo, Error> {
-        let json_data = std::fs::read_to_string(&std::path::Path::new(&UserInfo::user_file(username)))?;
+        let json_data =
+            std::fs::read_to_string(&std::path::Path::new(&UserInfo::user_file(username)))?;
         Ok(serde_json::from_str(&json_data)?)
     }
 

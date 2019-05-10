@@ -1,3 +1,15 @@
-<div>
-	- {{title}} | {{urls}} | {{tags}} | {{created}}
+<div class="pin">
+	<div class="pin_title">
+		<a href="{{lookup urls 0}}">{{title}}</a> | {{created}}
+	</div>
+	<div class="pin_description">
+		{{description}}
+	</div>
+	<div class="pin_tags">
+		{{#each tags}}
+			<a href="#">{{.}}</a>
+		{{/each}}
+	</div>
+	<div class="pin_subtitle">
+	</div>
 </div>
