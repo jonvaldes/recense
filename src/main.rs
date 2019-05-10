@@ -211,7 +211,6 @@ fn logout(req: HttpRequest<AppState>) -> actix_web::HttpResponse {
     actix_web::HttpResponse::SeeOther()
             .header(actix_web::http::header::LOCATION, "/")
             .finish()
-
 }
 
 fn main() {
