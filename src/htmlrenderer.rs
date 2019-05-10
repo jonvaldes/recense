@@ -1,5 +1,5 @@
 use failure::Error;
-use std::collections::BTreeMap;
+use serde::Serialize;
 
 pub struct HTMLRenderer {
     #[cfg(not(debug_assertions))]
@@ -25,11 +25,9 @@ impl HTMLRenderer {
         HTMLRenderer {}
     }
 
-    pub fn render_page(&self, filename: &str) -> Result<String, Error> {
-
-        let mut data = BTreeMap::new();
-        data.insert("world".to_string(), "世界!".to_string());
-
+    pub fn render_page<T>(&self, filename: &str, data: &T) -> Result<String, Error> 
+        where T: Serialize
+    {
 
         #[cfg(not(debug_assertions))]
         let result = {

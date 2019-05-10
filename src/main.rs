@@ -29,13 +29,13 @@ extern crate actix_web;
 extern crate argon2rs;
 extern crate chrono;
 extern crate env_logger;
+extern crate failure;
 extern crate handlebars;
 extern crate rand_pcg;
 extern crate serde;
-extern crate serde_json;
 extern crate sha1;
 
-#[macro_use] extern crate failure;
+#[macro_use] extern crate serde_json;
 #[macro_use] extern crate log; 
 
 use actix_web::middleware::{Logger, identity::RequestIdentity};
@@ -43,7 +43,6 @@ use actix_web::{fs::NamedFile, http, server, App, Form, State, HttpRequest, Resp
 use chrono::prelude::*;
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
-use std::io::Read;
 use std::rc::Rc;
 
 mod user;
@@ -134,18 +133,41 @@ fn get_all_pins(state: State<AppState>) -> impl Responder {
 }
 */
 
+fn login_screen(state: &AppState) -> actix_web::HttpResponse {
+
+    use std::borrow::Borrow;
+    let renderer : &htmlrenderer::HTMLRenderer = state.html_renderer.borrow();
+
+    let mut data = std::collections::HashMap::new();
+    data.insert(String::from("dummy"), String::from("dummy"));
+
+    let contents = match renderer.render_page("login", &data) {
+        Err(x) => return actix_web::HttpResponse::InternalServerError().finish(),
+        Ok(x) => x,
+    };
+
+    actix_web::HttpResponse::Ok()
+        .content_type("text/html")
+        .body(contents)
+}
 
 fn index(req: HttpRequest<AppState>) -> actix_web::HttpResponse  {
+    let username = req.identity().unwrap_or(String::new());
+
+    if username == "" {
+        return login_screen(req.state());
+    }
+
     use std::borrow::Borrow;
     let renderer : &htmlrenderer::HTMLRenderer = req.state().html_renderer.borrow();
 
-    let page_name = if req.identity() == None {
-            "login"
-        }else{
-            "index"
-        };
 
-    let contents = match renderer.render_page(page_name) {
+    let index_data = json!({
+        "username": username.clone(),
+        "pins": ["a","b","c"],
+    });
+
+    let contents = match renderer.render_page("index", &index_data) {
         Err(x) => return actix_web::HttpResponse::InternalServerError().finish(),
         Ok(x) => x,
     };
