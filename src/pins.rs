@@ -101,6 +101,9 @@ impl BackingStore {
 
         let pin_json = serde_json::to_string(&pin).unwrap();
         let filename = BackingStore::pin_filename("json", &username, &pin.id);
+
+        std::fs::create_dir_all(BackingStore::pin_directory(&username))?;
+
         println!("Filename: {}", filename);
         std::fs::write(filename, &pin_json)?;
        
@@ -115,6 +118,10 @@ impl BackingStore {
         format!("pins/{}/{}_v0.{}", username, id, extension)
     }
 
+    fn pin_directory(username: &str) -> String {
+        format!("pins/{}/", username)
+    }
+
     pub fn get_pin(&self, username: String, id: String) -> Result<Pin, Error> {
         let filename = BackingStore::pin_filename("json", &username, &id);
         self.get_pin_from_filename(&filename)
@@ -126,7 +133,14 @@ impl BackingStore {
     }
 
     pub fn get_all_pins(&self, username: &str) -> Result<Vec<Pin>, Error> {
-        std::fs::read_dir(format!("pins/{}", username))?
+        let path_str = BackingStore::pin_directory(username);
+        let dir_path = std::path::Path::new(&path_str);
+
+        if !dir_path.exists() {
+            return Ok(vec!());
+        }
+
+        std::fs::read_dir(dir_path)?
             .filter(|file| {
                 if !file.is_ok() {
                     return false;

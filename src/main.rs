@@ -161,10 +161,18 @@ fn index(req: HttpRequest<AppState>) -> actix_web::HttpResponse  {
     use std::borrow::Borrow;
     let renderer : &htmlrenderer::HTMLRenderer = req.state().html_renderer.borrow();
 
+    let pins = match req.state().storage.get_all_pins(&username) {
+       Err(err) => {
+            println!("Err: {:?}", err);
+            return actix_web::dev::HttpResponseBuilder::new(actix_web::http::StatusCode::OK).finish();
+       },
+       Ok(x) => x,
+    };
+
 
     let index_data = json!({
         "username": username.clone(),
-        "pins": ["a","b","c"],
+        "pins": pins,
     });
 
     let contents = match renderer.render_page("index", &index_data) {
