@@ -16,15 +16,20 @@ h2 {
 	display: inline-block;
 }
 
-input, textarea, button {
+input, textarea {
 	color: #000;
 	background-color: #fff;
-	border-color: #777;
+	border-color: #bbb;
+	border-width: 1px;
 	border-radius:2px;
 }
 
 button {
+	color: #000;
 	background-color: #eee;
+	border-color: #ccc;
+	border-width: 1.5px;
+	border-radius: 2px;
 }
 
 .header {
@@ -49,4 +54,9 @@ button {
 	margin: 0.5em;
 }
 
+.logo {
+	color: #000;
+	font-size: 2em;
+	text-decoration: none;
+}
 

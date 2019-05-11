@@ -1,46 +1,111 @@
 <html>
+<head>
+	<link rel="stylesheet" type="text/css" href="/static/style.css">
+	<style>
+		#main {
+			width: 1000px;
+			margin: 0 auto;
+		}
+
+		#split {
+			display:flex;
+			flex-direction: row;
+		}
+		#definition{
+			width: 600px;
+				margin: 0 auto;
+		}
+		hr {
+			margin: 2em auto;
+		}
+
+		#welcome_text {
+			width: 80%;
+			display:block;
+			margin: 0 auto;
+		}
+		button {
+			display:block;
+			margin: 0 auto;
+			font-size: 1.2em;
+				padding: 0.2em 0.6em;
+		}
+		a {
+			color: #000;
+		}
+		hr {
+			color: #eee;
+		}
+	</style>
+</head>
 <body>
 	<div id="header">
-		<div id="logo">Pinroar</div>
+		{{>logo}}
 	</div>
 	<div id="main">
 
-		<div id="signup_section">
-			<h2>Sign up</h2>
-			<form action="/signup" method="POST">
- 				<div>
-    				<label for="mail">E-mail:</label>
-    				<input type="email" id="mail" name="email">
-  				</div>
-				<div>
-    				<label for="username">Username:</label>
-    				<input type="text" id="username" name="username">
-  				</div>
-				<div>
-    				<label for="password">Password:</label>
-    				<input type="password" id="password" name="password">
-  				</div>
-				<div class="button">
-  					<button type="submit">Sign up</button>
-				</div>
-			</form>
-		</div>
-		<div id="login_section">
-			<h2>Login</h2>
-			<form action="/login" method="POST">
-				<div>
-    				<label for="username">Username:</label>
-    				<input type="text" id="username" name="username">
-  				</div>
-				<div>
-    				<label for="password">Password:</label>
-    				<input type="password" id="password" name="password">
-  				</div>
-				<div class="button">
-  					<button type="submit">Login</button>
-				</div>
-			</form>
+		<hr/>
 
+		<div id="welcome_text">
+			<b>Recense</b> is a link storage tool. It helps you keep links you don't want to lose, or that you
+			want to remember to read. <br/> <br/>
+
+			It is developed by <a href="https://mastodon.technology/@jon_valdes">Jon Valdes</a>. 
+		</div>
+
+		<hr/>
+
+		<div id="split">
+			<div id="signup_section">
+				<form action="/signup" method="POST">
+					<table>
+    					<tr>
+    						<td><label for="username">Username:</label></td>
+    						<td><input type="text" id="username" name="username"></td>
+    					</tr>
+    					<tr>
+    						<td><label for="password">Password:</label></td>
+    						<td><input type="password" id="password" name="password"></td>
+    					</tr>
+						<tr>
+    						<td><label for="mail">E-mail (optional):</label></td>
+    						<td><input type="email" id="mail" name="email"></td>
+    					</tr>
+
+  					</div>
+  					</table>
+  					<br/>
+					<div class="button">
+  						<button type="submit">Sign up</button>
+					</div>
+				</form>
+			</div>
+			<hr/>
+			<div id="login_section">
+				<form action="/login" method="POST">
+					<table>
+						<tr>
+    						<td><label for="username">Username:</label></td>
+    						<td><input type="text" id="username" name="username"></td>
+    					</tr>
+						<tr>
+    						<td><label for="password">Password:</label></td>
+    						<td><input type="password" id="password" name="password"></td>
+  						</tr>
+  					</table>
+  					<br/>
+					<div class="button">
+  						<button type="submit">Login</button>
+					</div>
+				</form>
+
+			</div>
+		</div>
+
+		<hr/>
+		<div id="definition">
+			<h3>Recense</h3>
+			&nbsp;&nbsp;&nbsp;&nbsp;1. To review; to revise.
 		</div>
 
 	</div>

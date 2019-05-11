@@ -9,8 +9,37 @@
  *
  * TODO
  * -----
-  *
+ *
+ * - Rename to:
+ *      - pinca.se
+ *      - pinho.se
+ *      - pinhou.se
+ *      - dontlo.se
+ *      - neverlo.se
+ *      - pinwi.se
+ *      - linkwi.se
+ *      - pinmu.se
+ *      - linkdo.se
+ *      - pindo.se
+ *      - pinlen.se
+ *      - linklen.se
+ *      - fossili.se
+ *      - periphra.se
+ *      - prepen.se : Contemplated or arranged in advance; premeditated: malice prepense. 
+ *
+ *      ----------------------
+ *      - recen.se : to make a critical revision of a text
+ *      ----------------------
+ *
+ * - print timestamps in legible way
+ * - Clean design of login page
+ * - Do user name validation
+ * - Make signup log you in
+ * - Implement "view pin" page
+ * - Implement trash can
  * - Implement searching through pins
+ * - Implement downloading your pins in a zip file
+ * - Implement getting the saved version of the page
  * - Implement getting a website's title
  * - Handle adding the same URL twice
  * -
