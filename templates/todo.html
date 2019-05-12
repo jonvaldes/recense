@@ -1,0 +1,56 @@
+<html>
+<head>
+	{{>common_header}}
+	<link rel="stylesheet" type="text/css" href="/static/style.css">
+	<style>
+		#main {
+			width: 1000px;
+			margin: 0 auto;
+		}
+		a {
+			color: #000;
+		}
+		hr {
+			color: #eee;
+		}
+
+		#definition{
+			width: 600px;
+			margin: 0 auto;
+		}
+		.def {
+			font-size: 1.5em;
+			font-weight: bold;
+		}
+	</style>
+</head>
+<body>
+	<div id="header">
+		{{>logo}}
+	</div>
+	<div id="main">
+
+		<div id="definition">
+			<span class="def">to-do</span> (təˈduː)<br/>
+			n, pl <b>-dos</b><br/>
+			&nbsp;&nbsp;&nbsp;&nbsp;a commotion, fuss, or quarrel <br/><br/>
+
+			<span class="def">todo</span> [Spanish] (toh-doh)<br/>
+
+			<span style="font-variant:small-caps">pronoun</span><br/>
+			3. (totality) <br/>
+			&nbsp;&nbsp;&nbsp;&nbsp;a. everything <br/><br/>
+		</div>
+
+		<hr/>
+
+		<div>
+			This is the current list of things I'm planning on working on for <span
+		 style="font-size:1.5em">Recen.se</span>:<br/>
+
+	 	{{{items}}}
+		</div>
+		<hr/>
+	</div>
+</body>
+</html>

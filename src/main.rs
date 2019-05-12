@@ -1,64 +1,20 @@
-/*
- * - Taking screenshots: Supposedly Firefox can take screenshots in a "headless" mode it has. I've
- * been unable to make it work, though. In theory this should be how you do that:
- *      firefox -no-remote -url https://valdes.cc/ -screenshot test.jpg
- *      (add "-P <profilename>" to make it use another profile and allow several instances of
- *      Firefox running)
- *      See: https://developer.mozilla.org/en-US/docs/Mozilla/Firefox/Headless_mode
- *
- *
- * TODO
- * -----
- *
- * - Rename to:
- *      - pinca.se
- *      - pinho.se
- *      - pinhou.se
- *      - dontlo.se
- *      - neverlo.se
- *      - pinwi.se
- *      - linkwi.se
- *      - pinmu.se
- *      - linkdo.se
- *      - pindo.se
- *      - pinlen.se
- *      - linklen.se
- *      - fossili.se
- *      - periphra.se
- *      - prepen.se : Contemplated or arranged in advance; premeditated: malice prepense. 
- *
- *      ----------------------
- *      - recen.se : to make a critical revision of a text
- *      ----------------------
- *
- * - print timestamps in legible way
- * - Clean design of login page
- * - Do user name validation
- * - Make signup log you in
- * - Implement "view pin" page
- * - Implement trash can
- * - Implement searching through pins
- * - Implement downloading your pins in a zip file
- * - Implement getting the saved version of the page
- * - Implement getting a website's title
- * - Handle adding the same URL twice
- * -
- */
-
 extern crate actix_web;
 extern crate argon2rs;
 extern crate chrono;
 extern crate env_logger;
-extern crate failure;
-extern crate handlebars;
+extern crate pulldown_cmark;
 extern crate rand_pcg;
 extern crate serde;
 extern crate sha1;
 
 #[macro_use]
-extern crate serde_json;
+extern crate failure;
+#[macro_use]
+extern crate handlebars;
 #[macro_use]
 extern crate log;
+#[macro_use]
+extern crate serde_json;
 
 use actix_web::middleware::{identity::RequestIdentity, Logger};
 use actix_web::{fs::NamedFile, http, server, App, Form, HttpRequest, Responder, State};
@@ -166,7 +122,10 @@ fn login_screen(state: &AppState) -> actix_web::HttpResponse {
     data.insert(String::from("dummy"), String::from("dummy"));
 
     let contents = match renderer.render_page("login", &data) {
-        Err(x) => return actix_web::HttpResponse::InternalServerError().finish(),
+        Err(x) => {
+            error!("{}",x);
+            return actix_web::HttpResponse::InternalServerError().finish();
+        },
         Ok(x) => x,
     };
 
@@ -187,7 +146,7 @@ fn index(req: HttpRequest<AppState>) -> actix_web::HttpResponse {
 
     let pins = match req.state().storage.get_all_pins(&username) {
         Err(err) => {
-            println!("Err: {:?}", err);
+            error!("Err: {:?}", err);
             return actix_web::dev::HttpResponseBuilder::new(actix_web::http::StatusCode::OK)
                 .finish();
         }
@@ -200,7 +159,10 @@ fn index(req: HttpRequest<AppState>) -> actix_web::HttpResponse {
     });
 
     let contents = match renderer.render_page("index", &index_data) {
-        Err(x) => return actix_web::HttpResponse::InternalServerError().finish(),
+        Err(err) => {
+            error!("Err: {:?}", err);
+            return actix_web::HttpResponse::InternalServerError().finish();
+        }
         Ok(x) => x,
     };
 
@@ -208,6 +170,35 @@ fn index(req: HttpRequest<AppState>) -> actix_web::HttpResponse {
         .content_type("text/html")
         .body(contents)
 }
+
+fn todo(req: HttpRequest<AppState>) -> actix_web::HttpResponse {
+
+    use std::borrow::Borrow;
+    let renderer: &htmlrenderer::HTMLRenderer = req.state().html_renderer.borrow();
+
+    let items = match htmlrenderer::render_markdown_file("TODO.md") {
+        Err(err) => {
+            error!("Err: {:?}", err);
+            return actix_web::HttpResponse::InternalServerError().finish();
+        },
+        Ok(x) => x,
+    };
+
+    let todo_data = json!({"items": items});
+
+    let contents = match renderer.render_page("todo", &todo_data) {
+        Err(err) => {
+            error!("Err: {:?}", err);
+            return actix_web::HttpResponse::InternalServerError().finish();
+        },
+        Ok(x) => x,
+    };
+
+    actix_web::HttpResponse::Ok()
+        .content_type("text/html")
+        .body(contents)
+}
+
 
 fn static_files(req: HttpRequest<AppState>) -> actix_web::Result<NamedFile> {
     let path: PathBuf = req.match_info().query("path")?;
@@ -301,6 +292,7 @@ fn main() {
             ))
             //            .route("/get_all_pins", http::Method::GET, get_all_pins)
             .route("/", http::Method::GET, index)
+            .route("/todo", http::Method::GET, todo)
             .route("/static/{path:.*}", http::Method::GET, static_files)
             .route("/signup", http::Method::POST, signup)
             .route("/login", http::Method::POST, login)

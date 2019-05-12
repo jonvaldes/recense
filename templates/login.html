@@ -1,5 +1,6 @@
 <html>
 <head>
+	{{>common_header}}
 	<link rel="stylesheet" type="text/css" href="/static/style.css">
 	<style>
 		#main {
@@ -50,7 +51,8 @@
 			<b>Recense</b> is a link storage tool. It helps you keep links you don't want to lose, or that you
 			want to remember to read. <br/> <br/>
 
-			It is developed by <a href="https://mastodon.technology/@jon_valdes">Jon Valdes</a>. 
+			It is developed by me, <a href="https://mastodon.technology/@jon_valdes">Jon Valdes</a>.  <br/><br/>
+			I'm working on this project in my spare time, and this is <a href="/todo">the current TO-DO list.</a>
 		</div>
 
 		<hr/>
@@ -64,7 +66,7 @@
     						<td><input type="text" id="username" name="username"></td>
     					</tr>
     					<tr>
-    						<td><label for="password">Password:</label></td>
+    						<td><label for="password">Password (10 chars minimum):</label></td>
     						<td><input type="password" id="password" name="password"></td>
     					</tr>
 						<tr>
