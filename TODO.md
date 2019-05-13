@@ -1,10 +1,5 @@
 ### High priority
-- Set up a docker container with Debian jessie, the rust compiler and a git clone of the repo.
-- Build a rust executable that does run on the debian version the server runs
-- Change nginx config to support recen.se
-- Install recen.se program in droplet
-- Add SSL support (let nginx handle it)
-- Setup letsencrypt for new domain
+- Write automated deployment scripts
 - Implement deleting/trash can
 - Make signup log you in
 - Show signup/login errors to user
@@ -24,7 +19,6 @@
 - Implement "view pin" page, showing the saved version of the page
 - Setup automated backup system
 - Implement pin data editting
-- Write automated deployment scripts
 
 ### Low priority
 - Add way to bring down recen.se server for maintenance and still show something to users
