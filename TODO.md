@@ -1,5 +1,6 @@
 ### High priority
 - Write automated deployment scripts
+- Add link to TO-DO when you're logged in
 - Implement deleting/trash can
 - Make signup log you in
 - Show signup/login errors to user

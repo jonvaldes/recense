@@ -61,6 +61,7 @@ impl BackingStore {
 
             println!("Getting url: {}", download_request.url);
 
+            /*
             let output =std::process::Command::new("chromium-browser")
                 .arg("--headless")
                 .arg("--disable-gpu")
@@ -80,6 +81,7 @@ impl BackingStore {
             if let Err(x) = std::fs::write(filename, &output.stdout) {
                 println!("Error writing w3m output: {}", x);
             }
+            */
         }
     }
 
