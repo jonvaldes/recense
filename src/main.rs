@@ -266,7 +266,7 @@ fn logout(req: HttpRequest<AppState>) -> actix_web::HttpResponse {
 
 fn main() {
     //std::env::set_var("RUST_LOG", "debug");
-    std::env::set_var("RUST_LOG", "pinroar=debug,actix_web=debug,handlebars=debug");
+    std::env::set_var("RUST_LOG", "recense=debug,actix_web=debug,handlebars=debug");
     env_logger::init();
 
     let cookie_key = {

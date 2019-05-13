@@ -1,5 +1,5 @@
 [package]
-name = "pinroar"
+name = "recense"
 version = "0.1.0"
 authors = ["Jon Valdés <jon@valdes.cc>"]
 edition = "2018"
