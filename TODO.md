@@ -1,4 +1,5 @@
 ### High priority
+- Set up a docker container with Debian jessie, the rust compiler and a git clone of the repo.
 - Build a rust executable that does run on the debian version the server runs
 - Change nginx config to support recen.se
 - Install recen.se program in droplet
