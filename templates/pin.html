@@ -1,6 +1,6 @@
 <div class="pin">
 	<div class="pin_title">
-		<a href="{{lookup urls 0}}">{{title}}</a> | {{format_time created}}
+		<a href="{{lookup urls 0}}">{{title}}</a> | 
 	</div>
 	<div class="pin_description">
 		{{description}}
@@ -12,6 +12,5 @@
 	</div>
 	<div class="pin_subtitle">
 	</div>
-	<button type="edit">Edit</button>
-	<button type="submit">Delete</button>
+	<div>{{format_time created}} <button type="edit">Edit</button> <button type="submit">Delete</button></div>
 </div>

@@ -17,22 +17,17 @@ pub struct Pin {
 
 impl Pin {
     pub fn new() -> Pin {
+        let now = Utc::now();
         Pin {
-            id: sha1::Sha1::from(Utc::now().to_rfc3339()).hexdigest(),
+            id: sha1::Sha1::from(format!("{}", now.timestamp_nanos())).hexdigest(),
             title: String::from(""),
             urls: vec![],
             description: String::new(),
             tags: vec![],
             starred: false,
             unread: true,
-            created: Utc::now(),
+            created: now,
         }
-    }
-
-    pub fn id_from_url(url: &str) -> String {
-        let mut sha = sha1::Sha1::new();
-        sha.update(url.as_bytes());
-        sha.hexdigest()
     }
 
     pub fn fill_defaults(&mut self) {
@@ -45,18 +40,12 @@ impl Pin {
                 self.title = default_pin.title;
             }
         }
-        if !self.urls.is_empty() {
-            let mut sha = sha1::Sha1::new();
-            self.urls.iter().for_each(|url| sha.update(url.as_bytes()));
-            self.id = sha.hexdigest();
-        } else {
-            self.id = default_pin.id;
-        }
     }
 }
 
 struct DownloadRequest {
     url: String,
+    pin_id: String,
     username: String,
 }
 
@@ -72,14 +61,22 @@ impl BackingStore {
 
             println!("Getting url: {}", download_request.url);
 
-            let output = std::process::Command::new("w3m")
+            let output =std::process::Command::new("chromium-browser")
+                .arg("--headless")
+                .arg("--disable-gpu")
+                .arg("--window-size=1280,1696")
+                .arg("--screenshot")
+                .arg("--dump-dom")
                 .arg(&download_request.url)
-                .arg("-dump")
                 .output()
-                .expect("Failed to run w3m");
+                .expect("Failed to run chromium");
 
-            let id = Pin::id_from_url(&download_request.url);
-            let filename = BackingStore::pin_filename("txt", &download_request.username, &id);
+            // TODO - MOVE screenshot.png to the right place
+
+            let screenshot_filename = BackingStore::pin_filename("png", &download_request.username, &download_request.pin_id);
+
+
+            let filename = BackingStore::pin_filename("html", &download_request.username, &download_request.pin_id);
             if let Err(x) = std::fs::write(filename, &output.stdout) {
                 println!("Error writing w3m output: {}", x);
             }
@@ -109,6 +106,7 @@ impl BackingStore {
             self.in_channel
                 .send(DownloadRequest {
                     url: pin.urls[0].clone(),
+                    pin_id: pin.id,
                     username,
                 })
                 .unwrap();
@@ -161,5 +159,20 @@ impl BackingStore {
                 self.get_pin_from_filename(&file.path().as_path().to_str().unwrap())
             })
             .collect()
+    }
+
+
+    pub fn search_pins(&self, username: &str, search_pattern: &str) -> Result<Vec<Pin>, Error> {
+        let pins = self.get_all_pins(username)?;
+
+        Ok(pins.iter().filter(|p| {
+
+            p.title.contains(search_pattern) ||
+                p.urls.iter().any(|u| u.contains(search_pattern)) ||
+                p.description.contains(search_pattern) ||
+                p.tags.iter().any(|t| t.contains(search_pattern))
+
+        }).cloned().collect())
+
     }
 }
