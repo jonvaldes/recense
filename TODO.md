@@ -8,7 +8,6 @@
 - Implement searching through pins (including tag-filtered searches)
 - Clean design of login page
 - Make sure font usage complies with license [https://fontlibrary.org/en/font/glacial-indifference]()
-- Sort pins by age by default
 - Find better design for "add pin" and header sections
 
 ### Medium priority

@@ -143,7 +143,7 @@ impl BackingStore {
             return Ok(vec![]);
         }
 
-        std::fs::read_dir(dir_path)?
+        let pins_res : Result<Vec<Pin>, Error> = std::fs::read_dir(dir_path)?
             .filter(|file| {
                 if !file.is_ok() {
                     return false;
@@ -160,7 +160,16 @@ impl BackingStore {
                 let file = file.unwrap();
                 self.get_pin_from_filename(&file.path().as_path().to_str().unwrap())
             })
-            .collect()
+            .collect();
+
+        if pins_res.is_err() {
+            return pins_res;
+        }
+
+        let mut pins = pins_res.unwrap();
+            pins.sort_by(|a,b| b.created.cmp(&a.created));
+
+        Ok(pins)
     }
 
 
