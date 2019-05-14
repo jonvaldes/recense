@@ -1,6 +1,7 @@
 ### High priority
-- Write automated deployment scripts
+- Setup SSH key for server so I can push updates without typing password 400 times
 - Add link to TO-DO when you're logged in
+- Add FAQ
 - Implement deleting/trash can
 - Make signup log you in
 - Show signup/login errors to user
