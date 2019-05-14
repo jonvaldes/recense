@@ -36,6 +36,16 @@ button {
 	display:flex;
 	flex-direction: row;
 }
+
+.tutorial {
+	font-size: 1.1em;
+	padding:30px;
+	box-shadow: 2px 2px 4px 2px #aaa;
+	width: 400px;
+	display:inline-block;
+	margin: 150px 300px;
+
+}
 	
 #add_pin_panel{
 	display: none;

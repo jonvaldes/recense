@@ -160,9 +160,11 @@ fn index(req: HttpRequest<AppState>) -> actix_web::HttpResponse {
         Ok(x) => x,
     };
 
+    let pin_count = pins.len();
     let index_data = json!({
         "username": username.clone(),
         "pins": pins,
+        "pin_count": pin_count,
     });
 
     let contents = match renderer.render_page("index", &index_data) {
