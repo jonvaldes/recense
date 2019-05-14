@@ -1,5 +1,4 @@
 ### High priority
-- Add FAQ to login page
 - Implement deleting/trash can
 - Make signup log you in
 - Show signup/login errors to user
