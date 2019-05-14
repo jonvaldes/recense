@@ -18,7 +18,7 @@ extern crate serde_json;
 
 use actix_web::middleware::{identity::RequestIdentity, Logger};
 use actix_web::{fs::NamedFile, http, server, App, Form, HttpRequest, Responder, State};
-use chrono::prelude::*;
+//use chrono::prelude::*;
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 use std::rc::Rc;
@@ -28,7 +28,6 @@ mod pins;
 mod user;
 use pins::*;
 
-#[derive(Clone)]
 struct AppState {
     storage: BackingStore,
     html_renderer: Rc<htmlrenderer::HTMLRenderer>,
@@ -298,7 +297,7 @@ fn main() {
         use rand_pcg::rand_core::RngCore;
         let mut cookie_key = vec![0u8; 32];
 
-        let timestamp = Utc::now().timestamp_nanos();
+        let timestamp = 0xC0DEFEFEBADC0FFEEu128; //Utc::now().timestamp_nanos();
         rand_pcg::Mcg128Xsl64::new(0x1337f00dd15ea5e5u128 + timestamp as u128)
             .fill_bytes(&mut cookie_key);
         cookie_key

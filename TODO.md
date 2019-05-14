@@ -1,5 +1,4 @@
 ### High priority
-- Make sure the data stored in the auth cookie is actually secure
 - Do a common header for all pages, with two modes: signed in and not
 - Implement deleting/trash can
 - Show signup/login errors to user
