@@ -80,6 +80,13 @@ fn add_pin(
     }
     if let Some(tags) = pin_info.tags {
         pin.tags = tags
+            .chars()
+            .map(|c| c.to_lowercase().collect::<String>())
+            .collect::<String>()
+            .chars()
+            // I believe we could potentially support weird chars, but this'll do for now
+            .filter(|c| c.is_alphanumeric() || c.is_whitespace() || *c == '_') 
+            .collect::<String>()
             .split_whitespace()
             .filter(|x| !x.is_empty())
             .map(|x| String::from(x))
