@@ -1,6 +1,5 @@
 ### High priority
-- Add link to TO-DO when you're logged in
-- Add FAQ
+- Add FAQ to login page
 - Implement deleting/trash can
 - Make signup log you in
 - Show signup/login errors to user
@@ -10,7 +9,7 @@
 - Make sure font usage complies with license [https://fontlibrary.org/en/font/glacial-indifference]()
 - Validate tags as simple lowercase text
 - Sort pins by age by default
-- Find better design for "add pin" section
+- Find better design for "add pin" and header sections
 
 ### Medium priority
 - Add way to edit user info

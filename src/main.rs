@@ -171,12 +171,9 @@ fn index(req: HttpRequest<AppState>) -> actix_web::HttpResponse {
         .body(contents)
 }
 
-fn todo(req: HttpRequest<AppState>) -> actix_web::HttpResponse {
+fn markdown_page(markdown_filename: &str, template_name: &str, renderer: &htmlrenderer::HTMLRenderer) -> actix_web::HttpResponse {
 
-    use std::borrow::Borrow;
-    let renderer: &htmlrenderer::HTMLRenderer = req.state().html_renderer.borrow();
-
-    let items = match htmlrenderer::render_markdown_file("TODO.md") {
+    let markdown = match htmlrenderer::render_markdown_file(markdown_filename) {
         Err(err) => {
             error!("Err: {:?}", err);
             return actix_web::HttpResponse::InternalServerError().finish();
@@ -184,9 +181,9 @@ fn todo(req: HttpRequest<AppState>) -> actix_web::HttpResponse {
         Ok(x) => x,
     };
 
-    let todo_data = json!({"items": items});
+    let markdown_data = json!({"markdown": markdown});
 
-    let contents = match renderer.render_page("todo", &todo_data) {
+    let contents = match renderer.render_page(template_name, &markdown_data) {
         Err(err) => {
             error!("Err: {:?}", err);
             return actix_web::HttpResponse::InternalServerError().finish();
@@ -199,6 +196,21 @@ fn todo(req: HttpRequest<AppState>) -> actix_web::HttpResponse {
         .body(contents)
 }
 
+fn todo(req: HttpRequest<AppState>) -> actix_web::HttpResponse {
+
+    use std::borrow::Borrow;
+    let renderer: &htmlrenderer::HTMLRenderer = req.state().html_renderer.borrow();
+
+    markdown_page("TODO.md", "todo", renderer)
+}
+
+fn faq(req: HttpRequest<AppState>) -> actix_web::HttpResponse {
+
+    use std::borrow::Borrow;
+    let renderer: &htmlrenderer::HTMLRenderer = req.state().html_renderer.borrow();
+
+    markdown_page("FAQ.md", "faq", renderer)
+}
 
 fn static_files(req: HttpRequest<AppState>) -> actix_web::Result<NamedFile> {
     let path: PathBuf = req.match_info().query("path")?;
@@ -293,6 +305,7 @@ fn main() {
             //            .route("/get_all_pins", http::Method::GET, get_all_pins)
             .route("/", http::Method::GET, index)
             .route("/todo", http::Method::GET, todo)
+            .route("/faq", http::Method::GET, faq)
             .route("/static/{path:.*}", http::Method::GET, static_files)
             .route("/signup", http::Method::POST, signup)
             .route("/login", http::Method::POST, login)
