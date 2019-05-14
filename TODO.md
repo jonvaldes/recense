@@ -1,6 +1,8 @@
 ### High priority
+- Show "tutorial" when no pins in the account
+- Make sure the data stored in the auth cookie is actually secure
+- Do a common header for all pages, with two modes: signed in and not
 - Implement deleting/trash can
-- Make signup log you in
 - Show signup/login errors to user
 - Implement tag-based filtering
 - Implement searching through pins (including tag-filtered searches)

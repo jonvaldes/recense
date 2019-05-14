@@ -227,18 +227,22 @@ struct SignupInfo {
     email: String,
 }
 
-fn signup(form: Form<SignupInfo>) -> actix_web::HttpResponse {
+fn signup(form: Form<SignupInfo>, req: HttpRequest<AppState>) -> actix_web::HttpResponse {
     let signup_info = form.into_inner();
 
     if let Err(x) = user::UserInfo::new_user(
-        signup_info.username,
+        signup_info.username.clone(),
         signup_info.email,
         signup_info.password,
     ) {
         error!("Error trying to create new user: {}", x);
         actix_web::HttpResponse::InternalServerError().finish()
     } else {
-        actix_web::HttpResponse::Ok().finish()
+        req.remember(signup_info.username);
+
+        actix_web::HttpResponse::SeeOther()
+            .header(actix_web::http::header::LOCATION, "/")
+            .finish()
     }
 }
 
@@ -260,7 +264,7 @@ fn login(form: Form<LoginInfo>, req: HttpRequest<AppState>) -> actix_web::HttpRe
     };
 
     if user.verify_password(login_info.password) {
-        req.remember(login_info.username); // TODO -- Can we store this directly, or do we have to store a secure token?
+        req.remember(login_info.username);
         actix_web::HttpResponse::SeeOther()
             .header(actix_web::http::header::LOCATION, "/")
             .finish()
