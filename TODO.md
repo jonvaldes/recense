@@ -3,7 +3,6 @@
 - Implement deleting/trash can
 - Show signup/login errors to user
 - Implement tag-based filtering
-- Improve UI for searching
 - Clean design of login page
 - Make sure font usage complies with license [https://fontlibrary.org/en/font/glacial-indifference]()
 - Find better design for "add pin" and header sections

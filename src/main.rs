@@ -178,6 +178,7 @@ fn index(req: HttpRequest<AppState>) -> actix_web::HttpResponse {
         "username": username.clone(),
         "pins": pins,
         "pin_count": pin_count,
+        "search_term": search_query.unwrap_or(&String::new()),
     });
 
     let contents = match renderer.render_page("index", &index_data) {
