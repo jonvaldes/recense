@@ -10,8 +10,6 @@ pub struct Pin {
     pub urls: Vec<String>,
     pub description: String,
     pub tags: Vec<String>,
-    pub starred: bool,
-    pub unread: bool,
     pub created: DateTime<Utc>,
 }
 
@@ -24,8 +22,6 @@ impl Pin {
             urls: vec![],
             description: String::new(),
             tags: vec![],
-            starred: false,
-            unread: true,
             created: now,
         }
     }
@@ -135,6 +131,21 @@ impl BackingStore {
         Ok(serde_json::from_str(&json_data)?)
     }
 
+    pub fn get_all_tags(&self, username: &str) -> Result<Vec<(String, usize)>, Error> {
+        let pins = self.get_all_pins(username)?;
+
+        let mut result = std::collections::HashMap::<String,usize>::new();
+        pins.iter().map(|p| p.tags.clone()).flatten().for_each(|tag|{
+            let counter = result.entry(tag).or_insert(0);
+            *counter += 1;
+        });
+
+        let mut result_vec : Vec<(String, usize)>= result.iter().map(|(k,v)| (k.clone(),v.clone())).collect();
+        result_vec.sort_by(|a, b| a.0.cmp(&b.0));
+
+        Ok(result_vec)
+    }
+
     pub fn get_all_pins(&self, username: &str) -> Result<Vec<Pin>, Error> {
         let path_str = BackingStore::pin_directory(username);
         let dir_path = std::path::Path::new(&path_str);
@@ -143,7 +154,7 @@ impl BackingStore {
             return Ok(vec![]);
         }
 
-        let pins_res : Result<Vec<Pin>, Error> = std::fs::read_dir(dir_path)?
+        let pins_res: Result<Vec<Pin>, Error> = std::fs::read_dir(dir_path)?
             .filter(|file| {
                 if !file.is_ok() {
                     return false;
@@ -167,25 +178,31 @@ impl BackingStore {
         }
 
         let mut pins = pins_res.unwrap();
-            pins.sort_by(|a,b| b.created.cmp(&a.created));
+        pins.sort_by(|a, b| b.created.cmp(&a.created));
 
         Ok(pins)
     }
-
 
     pub fn search_pins(&self, username: &str, search_pattern: &str) -> Result<Vec<Pin>, Error> {
         let pins = self.get_all_pins(username)?;
 
         let search_terms = search_pattern.split_whitespace();
 
-        Ok(pins.iter().filter(|p| {
-
-            p.title.contains(search_pattern) ||
-                p.urls.iter().any(|u| search_terms.clone().all(|term| u.contains(term))) ||
-                search_terms.clone().all(|term| p.description.contains(term)) ||
-                p.tags.iter().any(|tag| search_terms.clone().all(|term| tag.contains(term)))
-
-        }).cloned().collect())
-
+        Ok(pins
+            .iter()
+            .filter(|p| {
+                p.title.contains(search_pattern)
+                    || p.urls
+                        .iter()
+                        .any(|u| search_terms.clone().all(|term| u.contains(term)))
+                    || search_terms
+                        .clone()
+                        .all(|term| p.description.contains(term))
+                    || p.tags
+                        .iter()
+                        .any(|tag| search_terms.clone().all(|term| tag.contains(term)))
+            })
+            .cloned()
+            .collect())
     }
 }

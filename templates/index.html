@@ -44,14 +44,14 @@
 			<input type="text" name="url" placeholder="Url...">
 			<input type="text" name="description" placeholder="Description...">
 			<input type="text" name="tags" placeholder="Tags...">
-		
-			<input type="checkbox" name="starred">
- 			<label for="starred">Star</label>
-
-			<input type="checkbox" name="unread">
- 			<label for="unread">To Read</label>
   			<button type="submit">Add Pin</button>
 		</form>
+	</div>
+
+	<div class="tags">
+	{{#each tags}}
+	<a href="/?search={{lookup . 0}}">{{lookup . 0}}({{lookup. 1}})</a>
+	{{/each}}
 	</div>
 
 	<div class="pin_container">

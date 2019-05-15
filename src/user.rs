@@ -27,18 +27,25 @@ impl UserInfo {
             &[],
         );
 
-        ensure!( password.len() >= 8, "Password must be at least 10 characters long");
-        let all_chars_ok = username.chars().all(|c| c.is_ascii_alphanumeric() || c == '-' || c == '_' || c == '.');
+        ensure!(
+            password.len() >= 8,
+            "Password must be at least 10 characters long"
+        );
+        let all_chars_ok = username
+            .chars()
+            .all(|c| c.is_ascii_alphanumeric() || c == '-' || c == '_' || c == '.');
 
         ensure!(username.len() > 0, "User name cannot be empty");
         ensure!(all_chars_ok, "Username contains invalid characters");
-        ensure!(!UserInfo::user_dir(&username).exists(), "User already exists");
+        ensure!(
+            !UserInfo::user_dir(&username).exists(),
+            "User already exists"
+        );
 
         // TODO - Check that email address is not in use by any other user
         // TODO - Perform password strength validation
         // TODO - Perform username String validation
         // TODO - Check username doesn't exist yet
-
 
         std::fs::create_dir_all(&UserInfo::user_dir(&username))?;
 
@@ -67,8 +74,7 @@ impl UserInfo {
     }
 
     pub fn load_user_data(username: &str) -> Result<UserInfo, Error> {
-        let json_data =
-            std::fs::read_to_string(&UserInfo::user_file(username))?;
+        let json_data = std::fs::read_to_string(&UserInfo::user_file(username))?;
         Ok(serde_json::from_str(&json_data)?)
     }
 

@@ -48,8 +48,6 @@ struct PinInfo {
     url: Option<String>,
     description: Option<String>,
     tags: Option<String>, // %20-separated
-    starred: Option<String>,
-    unread: Option<String>,
 }
 
 fn add_pin(
@@ -84,20 +82,14 @@ fn add_pin(
             .collect::<String>()
             .chars()
             // I believe we could potentially support weird chars, but this'll do for now
-            .filter(|c| c.is_alphanumeric() || c.is_whitespace() || *c == '_') 
+            .filter(|c| c.is_alphanumeric() || c.is_whitespace() || *c == '_')
             .collect::<String>()
             .split_whitespace()
             .filter(|x| !x.is_empty())
             .map(|x| String::from(x))
             .collect();
     }
-    if let Some(starred) = pin_info.starred {
-        pin.starred = starred == "on";
-    }
-    if let Some(unread) = pin_info.unread {
-        pin.unread = unread == "on";
-    }
-
+    
     if let Err(err) = state.storage.add_pin(req.identity().unwrap(), pin) {
         error!("Err: {:?}", err);
     }
@@ -129,9 +121,9 @@ fn login_screen(state: &AppState) -> actix_web::HttpResponse {
 
     let contents = match renderer.render_page("login", &data) {
         Err(x) => {
-            error!("{}",x);
+            error!("{}", x);
             return actix_web::HttpResponse::InternalServerError().finish();
-        },
+        }
         Ok(x) => x,
     };
 
@@ -157,21 +149,31 @@ fn index(req: HttpRequest<AppState>) -> actix_web::HttpResponse {
         match req.state().storage.get_all_pins(&username) {
             Err(err) => {
                 error!("Err: {:?}", err);
-                return actix_web::dev::HttpResponseBuilder::new(actix_web::http::StatusCode::OK)
-                    .finish();
+                return actix_web::HttpResponse::InternalServerError().finish();
             }
             Ok(x) => x,
         }
-    }else{
-        match req.state().storage.search_pins(&username, &search_query.unwrap()) {
+    } else {
+        match req
+            .state()
+            .storage
+            .search_pins(&username, &search_query.unwrap())
+        {
             Err(err) => {
                 error!("Err: {:?}", err);
-                return actix_web::dev::HttpResponseBuilder::new(actix_web::http::StatusCode::OK)
-                    .finish();
+                return actix_web::HttpResponse::InternalServerError().finish();
             }
             Ok(x) => x,
         }
     };
+    let tags = match req.state().storage.get_all_tags(&username) {
+        Err(err) => {
+            error!("Err: {:?}", err);
+            return actix_web::HttpResponse::InternalServerError().finish();
+        },
+        Ok(x) => x,
+    };
+
 
     let pin_count = pins.len();
     let index_data = json!({
@@ -179,6 +181,7 @@ fn index(req: HttpRequest<AppState>) -> actix_web::HttpResponse {
         "pins": pins,
         "pin_count": pin_count,
         "search_term": search_query.unwrap_or(&String::new()),
+        "tags": tags,
     });
 
     let contents = match renderer.render_page("index", &index_data) {
@@ -194,23 +197,26 @@ fn index(req: HttpRequest<AppState>) -> actix_web::HttpResponse {
         .body(contents)
 }
 
-fn markdown_page(markdown_filename: &str, template_name: &str, renderer: &htmlrenderer::HTMLRenderer) -> actix_web::HttpResponse {
-
+fn markdown_page(
+    markdown_filename: &str,
+    template_name: &str,
+    renderer: &htmlrenderer::HTMLRenderer,
+) -> actix_web::HttpResponse {
     let markdown = match htmlrenderer::render_markdown_file(markdown_filename) {
         Err(err) => {
             error!("Err: {:?}", err);
             return actix_web::HttpResponse::InternalServerError().finish();
-        },
+        }
         Ok(x) => x,
     };
 
-    let markdown_data = json!({"markdown": markdown});
+    let markdown_data = json!({ "markdown": markdown });
 
     let contents = match renderer.render_page(template_name, &markdown_data) {
         Err(err) => {
             error!("Err: {:?}", err);
             return actix_web::HttpResponse::InternalServerError().finish();
-        },
+        }
         Ok(x) => x,
     };
 
@@ -220,7 +226,6 @@ fn markdown_page(markdown_filename: &str, template_name: &str, renderer: &htmlre
 }
 
 fn todo(req: HttpRequest<AppState>) -> actix_web::HttpResponse {
-
     use std::borrow::Borrow;
     let renderer: &htmlrenderer::HTMLRenderer = req.state().html_renderer.borrow();
 
@@ -228,7 +233,6 @@ fn todo(req: HttpRequest<AppState>) -> actix_web::HttpResponse {
 }
 
 fn faq(req: HttpRequest<AppState>) -> actix_web::HttpResponse {
-
     use std::borrow::Borrow;
     let renderer: &htmlrenderer::HTMLRenderer = req.state().html_renderer.borrow();
 

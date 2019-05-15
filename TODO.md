@@ -1,22 +1,22 @@
 ### High priority
-- Make tags add themselves to the search term if they're not there, or remove themselves if they are
-- Make search query persist when adding pins
+- Create favicon
+- Move the list of all tags to the side
+- Implement pin data editting
 - Do a common header for all pages, with two modes: signed in and not
 - Implement deleting/trash can
 - Show signup/login errors to user
-- Implement tag-based filtering
 - Clean design of login page
 - Make sure font usage complies with license [https://fontlibrary.org/en/font/glacial-indifference]()
 - Find better design for "add pin" and header sections
 
 ### Medium priority
+- Make search query persist when adding pins
 - Add way to edit user info
 - Add way to delete accounts
 - Add pin pagination
 - Add server-side analytics/logging
 - Implement "view pin" page, showing the saved version of the page
 - Setup automated backup system
-- Implement pin data editting
 
 ### Low priority
 - Add way to bring down recen.se server for maintenance and still show something to users
@@ -33,4 +33,9 @@
 - Add support for markdown in pin description
 - Warn when adding the same URL twice?
 - Handle failure to download link
+
+
+## Bulk editing
+Being able to perform operations on many pins sounds like it's gonna be important in the future. Should keep
+that in mind.
 

@@ -8,14 +8,12 @@ pub struct HTMLRenderer {
     hbars: handlebars::Handlebars,
 }
 
-
 fn format_datetime(v: &str) -> String {
-
     let dt = match DateTime::<FixedOffset>::parse_from_rfc3339(&v) {
         Err(x) => {
             error!("{}", x);
             return String::from("unknown");
-        },
+        }
         Ok(x) => x,
     };
 
@@ -31,9 +29,14 @@ fn format_datetime(v: &str) -> String {
     macro_rules! format_ago {
         ($e: expr) => {
             if $e > 0 {
-                return format!("{} {}{} ago", $e, stringify!($e), if $e > 1 { "s" } else {""} );
+                return format!(
+                    "{} {}{} ago",
+                    $e,
+                    stringify!($e),
+                    if $e > 1 { "s" } else { "" }
+                );
             }
-        }
+        };
     }
 
     format_ago!(year);
@@ -46,7 +49,6 @@ fn format_datetime(v: &str) -> String {
     String::from("just now")
 }
 
-
 handlebars_helper!(format_time: |s: str| format_datetime(s) );
 
 impl HTMLRenderer {
@@ -54,14 +56,13 @@ impl HTMLRenderer {
         #[cfg(not(debug_assertions))]
         {
             let mut hbars = handlebars::Handlebars::new();
-            
+
             hbars.register_helper("format_time", Box::new(format_time));
 
             assert!(hbars
                 .register_templates_directory(".html", "templates")
                 .is_ok());
 
-            
             HTMLRenderer { hbars }
         }
 
@@ -86,7 +87,6 @@ impl HTMLRenderer {
                 .register_templates_directory(".html", "templates")
                 .is_ok());
 
-
             hbars.render(filename, &data)?
         };
 
@@ -94,8 +94,8 @@ impl HTMLRenderer {
     }
 }
 
-pub fn render_markdown_file(filename: &str) -> Result<String,Error> {
-    use pulldown_cmark::{Parser, Options, html};
+pub fn render_markdown_file(filename: &str) -> Result<String, Error> {
+    use pulldown_cmark::{html, Options, Parser};
 
     let markdown_input = std::fs::read_to_string(filename)?;
 
