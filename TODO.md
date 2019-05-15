@@ -1,4 +1,6 @@
 ### High priority
+- Make tags add themselves to the search term if they're not there, or remove themselves if they are
+- Make search query persist when adding pins
 - Do a common header for all pages, with two modes: signed in and not
 - Implement deleting/trash can
 - Show signup/login errors to user

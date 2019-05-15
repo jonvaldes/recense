@@ -176,12 +176,14 @@ impl BackingStore {
     pub fn search_pins(&self, username: &str, search_pattern: &str) -> Result<Vec<Pin>, Error> {
         let pins = self.get_all_pins(username)?;
 
+        let search_terms = search_pattern.split_whitespace();
+
         Ok(pins.iter().filter(|p| {
 
             p.title.contains(search_pattern) ||
-                p.urls.iter().any(|u| u.contains(search_pattern)) ||
-                p.description.contains(search_pattern) ||
-                p.tags.iter().any(|t| t.contains(search_pattern))
+                p.urls.iter().any(|u| search_terms.clone().all(|term| u.contains(term))) ||
+                search_terms.clone().all(|term| p.description.contains(term)) ||
+                p.tags.iter().any(|tag| search_terms.clone().all(|term| tag.contains(term)))
 
         }).cloned().collect())
 
