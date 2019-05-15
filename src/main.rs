@@ -17,7 +17,7 @@ extern crate log;
 extern crate serde_json;
 
 use actix_web::middleware::{identity::RequestIdentity, Logger};
-use actix_web::{fs::NamedFile, http, server, App, Form, HttpRequest, Query, Responder, State};
+use actix_web::{fs::NamedFile, http, server, App, Form, HttpRequest, Responder, State};
 //use chrono::prelude::*;
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;

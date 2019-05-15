@@ -1,6 +1,9 @@
 ### Recense? Why the weird name?
-Remember that quote that goes "There are two hard problems in computer science: naming and cache
-invalidation"?
+
+Remember this quote?
+
+> There are only two hard things in Computer Science: cache invalidation and naming things.</br>
+> -- Phil Karlton
 
 Well, I made sure I didn't do any caching for this, but naming I couldn't avoid. And all the "normal" names
 were taken, so here we are.
