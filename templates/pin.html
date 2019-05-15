@@ -1,10 +1,17 @@
 <div class="pin">
 	<div class="pin_title">
-		<a href="{{lookup urls 0}}">{{title}}</a> | 
+		<a href="{{lookup urls 0}}">
+			{{#if (is_empty_string title)}}
+				{{lookup urls 0}}
+			{{else}}
+			{{title}}
+			{{/if}}	
+		</a> | 
 	</div>
 	<div class="pin_description">
 		{{description}}
 	</div>
+	
 	<div class="pin_tags">
 		{{#each tags}}
 		<a href="/?search={{.}}">{{.}}</a>
@@ -12,5 +19,9 @@
 	</div>
 	<div class="pin_subtitle">
 	</div>
-	<div>{{format_time created}} <button type="edit">Edit</button> <button type="submit">Delete</button></div>
+	<div>{{format_time created}} 
+		<a href="/view/{{id}}">View</a> 
+		<button type="edit">Edit</button> 
+		<button type="submit">Delete</button>
+	</div>
 </div>

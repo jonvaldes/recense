@@ -25,18 +25,6 @@ impl Pin {
             created: now,
         }
     }
-
-    pub fn fill_defaults(&mut self) {
-        let default_pin = Pin::new();
-
-        if self.title.is_empty() {
-            if !self.urls.is_empty() {
-                self.title = self.urls[0].clone();
-            } else {
-                self.title = default_pin.title;
-            }
-        }
-    }
 }
 
 struct DownloadRequest {
@@ -89,9 +77,6 @@ impl BackingStore {
     }
 
     pub fn add_pin(&self, username: String, pin: Pin) -> Result<(), Error> {
-        let mut pin = pin;
-        pin.fill_defaults();
-
         let pin_json = serde_json::to_string(&pin).unwrap();
         let filename = BackingStore::pin_filename("json", &username, &pin.id);
 
@@ -121,8 +106,8 @@ impl BackingStore {
         format!("pins/{}/", username)
     }
 
-    pub fn get_pin(&self, username: String, id: String) -> Result<Pin, Error> {
-        let filename = BackingStore::pin_filename("json", &username, &id);
+    pub fn get_pin(&self, username: &str, id: &str) -> Result<Pin, Error> {
+        let filename = BackingStore::pin_filename("json", username, id);
         self.get_pin_from_filename(&filename)
     }
 
@@ -186,21 +171,30 @@ impl BackingStore {
     pub fn search_pins(&self, username: &str, search_pattern: &str) -> Result<Vec<Pin>, Error> {
         let pins = self.get_all_pins(username)?;
 
+        let search_pattern = search_pattern.to_lowercase();
         let search_terms = search_pattern.split_whitespace();
 
         Ok(pins
             .iter()
             .filter(|p| {
-                p.title.contains(search_pattern)
+                let title = p.title.to_lowercase();
+
+                title.contains(&search_pattern)
                     || p.urls
                         .iter()
-                        .any(|u| search_terms.clone().all(|term| u.contains(term)))
+                        .any(|u| {
+                            let url = u.to_lowercase();
+                            search_terms.clone().all(|term| url.contains(term))
+                        })
                     || search_terms
                         .clone()
-                        .all(|term| p.description.contains(term))
+                        .all(|term| p.description.to_lowercase().contains(term))
                     || p.tags
                         .iter()
-                        .any(|tag| search_terms.clone().all(|term| tag.contains(term)))
+                        .any(|tag| {
+                            let tag = tag.to_lowercase();
+                            search_terms.clone().all(|term| tag.contains(term))
+                        })
             })
             .cloned()
             .collect())

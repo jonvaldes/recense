@@ -50,6 +50,7 @@ fn format_datetime(v: &str) -> String {
 }
 
 handlebars_helper!(format_time: |s: str| format_datetime(s) );
+handlebars_helper!(is_empty_string: |s: str| s == "" );
 
 impl HTMLRenderer {
     pub fn new() -> HTMLRenderer {
@@ -58,10 +59,12 @@ impl HTMLRenderer {
             let mut hbars = handlebars::Handlebars::new();
 
             hbars.register_helper("format_time", Box::new(format_time));
+            hbars.register_helper("is_empty_string", Box::new(is_empty_string));
 
-            assert!(hbars
-                .register_templates_directory(".html", "templates")
-                .is_ok());
+            if let Err(err) = hbars.register_templates_directory(".html", "templates") {
+                error!("Error loading HTML templates: {}", err);
+                panic!("no idea what to do now");
+            }
 
             HTMLRenderer { hbars }
         }
@@ -82,10 +85,12 @@ impl HTMLRenderer {
             let mut hbars = handlebars::Handlebars::new();
 
             hbars.register_helper("format_time", Box::new(format_time));
+            hbars.register_helper("is_empty_string", Box::new(is_empty_string));
 
-            assert!(hbars
-                .register_templates_directory(".html", "templates")
-                .is_ok());
+            if let Err(err) = hbars.register_templates_directory(".html", "templates") {
+                error!("Error loading HTML templates: {}", err);
+                panic!("no idea what to do now");
+            }
 
             hbars.render(filename, &data)?
         };

@@ -27,3 +27,4 @@ I'm fed up with pages that take ages to load. This is my attempt at fighting tha
 
 ### What's the tech stack behind this?
 It's a bunch of Rust code, written in the most straightforward way possible. Nothing fancy, really.
+

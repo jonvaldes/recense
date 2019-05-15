@@ -1,8 +1,11 @@
 ### High priority
-- Create favicon
-- Move the list of all tags to the side
-- Implement pin data editting
 - Do a common header for all pages, with two modes: signed in and not
+- Make the description field support Markdown
+- Fix "view pin" layout
+- Crop the beginning of the description for the general view.
+- When you have a search term it shouldn't show the tutorial, but a message saying no results found
+- Create favicon
+- Implement pin data editting
 - Implement deleting/trash can
 - Show signup/login errors to user
 - Clean design of login page
@@ -15,11 +18,11 @@
 - Add way to delete accounts
 - Add pin pagination
 - Add server-side analytics/logging
-- Implement "view pin" page, showing the saved version of the page
+	- Add performance tracking to see when we start running into issues with that
 - Setup automated backup system
+- Implement downloading your pins in a zip file
 
 ### Low priority
-- Add way to bring down recen.se server for maintenance and still show something to users
 - Add other sorting mechanisms for pins
 - Add different CSS for "dark mode"
 - Add mobile support to the CSS
@@ -28,7 +31,7 @@
   pins, as same URL can have different contents depending on when you take the sshot). Also, store html
   contents the same way
 - Rescale page image to smaller size, can't afford storing at full size.
-- Implement downloading your pins in a zip file
+- Implement "view pin" page, showing the saved version of the page
 - Implement getting a website's title to automate link naming?
 - Add support for markdown in pin description
 - Warn when adding the same URL twice?

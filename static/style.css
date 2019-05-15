@@ -69,4 +69,14 @@ button {
 	font-size: 2em;
 	text-decoration: none;
 }
+#main_contents {
+	flex-direction:row;
+}
+#tag_bar {
+	padding: 1em;
+	float: right;
+	display: flex;
+	flex-direction: column;
+	width: 150px;
 
+}

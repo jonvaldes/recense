@@ -99,19 +99,6 @@ fn add_pin(
         .finish()
 }
 
-/*
-fn get_all_pins(state: State<AppState>) -> impl Responder {
-
-    let username = "jon";
-
-    if let Err(err) = state.storage.get_all_pins(username) -> Result<Vec<Pin>, Error> {
-        println!("Err: {:?}", err);
-        actix_web::dev::HttpResponseBuilder::new(actix_web::http::StatusCode::OK).finish()
-    }
-
-}
-*/
-
 fn login_screen(state: &AppState) -> actix_web::HttpResponse {
     use std::borrow::Borrow;
     let renderer: &htmlrenderer::HTMLRenderer = state.html_renderer.borrow();
@@ -247,6 +234,50 @@ fn static_files(req: HttpRequest<AppState>) -> actix_web::Result<NamedFile> {
     ))?)
 }
 
+fn view_pin(req: HttpRequest<AppState>, path: actix_web::Path<String>) -> actix_web::HttpResponse {
+    println!("View pin!!!!!!");
+    let username = req.identity().unwrap_or(String::new());
+
+    if username == "" {
+        return actix_web::HttpResponse::SeeOther()
+            .header(actix_web::http::header::LOCATION, "/")
+            .finish()
+    }
+
+    use std::borrow::Borrow;
+    let renderer: &htmlrenderer::HTMLRenderer = req.state().html_renderer.borrow();
+
+    let pin_id = path;
+
+    let pin = match req.state().storage.get_pin(&username, &pin_id) {
+        Err(err) => {
+            error!("Err: {:?}", err);
+            return actix_web::HttpResponse::NotFound().finish();
+        },
+        Ok(x) => x,
+    };
+
+    let index_data = json!({
+        "pin": pin,
+    });
+
+    let contents = match renderer.render_page("view_pin", &index_data) {
+        Err(err) => {
+            error!("Err: {:?}", err);
+            return actix_web::HttpResponse::InternalServerError().finish();
+        }
+        Ok(x) => x,
+    };
+
+    actix_web::HttpResponse::Ok()
+        .content_type("text/html")
+        .body(contents)
+}
+
+
+
+
+
 #[derive(Deserialize)]
 struct SignupInfo {
     username: String,
@@ -342,6 +373,7 @@ fn main() {
             .route("/login", http::Method::POST, login)
             .route("/logout", http::Method::POST, logout)
             .route("/add_pin", http::Method::POST, add_pin)
+            .route("/view/{pin}", http::Method::GET, view_pin)
     })
     .bind("127.0.0.1:8081")
     .unwrap()
