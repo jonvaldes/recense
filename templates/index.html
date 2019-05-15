@@ -9,6 +9,20 @@
 			}
 		</script>
 	</head>
+	<script>
+	function onSearchChange() {
+    	var key = window.event.keyCode;
+
+    	// If the user has pressed enter
+    	if (key === 13) {
+        	document.location = "/?search=" + encodeURIComponent(document.getElementById("search_box").value);
+        	return false;
+    	}
+    	else {
+        	return true;
+    	}
+	}
+	</script>
 <body>
 	<div id="header">
 		{{>logo}}
@@ -17,7 +31,7 @@
 		<a href="/todo">To-Do</a>
 		<a href="/faq">FAQ</a>
 
-		<textarea rows=1 placeholder="Search..."></textarea>
+		<textarea id="search_box" rows=1 placeholder="Search..." onkeydown="onSearchChange();"></textarea>
 		<form id="logout_form" action="/logout" method="POST">
   			<button type="submit" style="display:block">Logout {{username}}</button>
 		</form>

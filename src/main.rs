@@ -17,7 +17,7 @@ extern crate log;
 extern crate serde_json;
 
 use actix_web::middleware::{identity::RequestIdentity, Logger};
-use actix_web::{fs::NamedFile, http, server, App, Form, HttpRequest, Responder, State};
+use actix_web::{fs::NamedFile, http, server, App, Form, HttpRequest, Query, Responder, State};
 //use chrono::prelude::*;
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
@@ -150,13 +150,27 @@ fn index(req: HttpRequest<AppState>) -> actix_web::HttpResponse {
     use std::borrow::Borrow;
     let renderer: &htmlrenderer::HTMLRenderer = req.state().html_renderer.borrow();
 
-    let pins = match req.state().storage.get_all_pins(&username) {
-        Err(err) => {
-            error!("Err: {:?}", err);
-            return actix_web::dev::HttpResponseBuilder::new(actix_web::http::StatusCode::OK)
-                .finish();
+    let query = req.query();
+    let search_query = query.get("search");
+
+    let pins = if search_query.is_none() {
+        match req.state().storage.get_all_pins(&username) {
+            Err(err) => {
+                error!("Err: {:?}", err);
+                return actix_web::dev::HttpResponseBuilder::new(actix_web::http::StatusCode::OK)
+                    .finish();
+            }
+            Ok(x) => x,
         }
-        Ok(x) => x,
+    }else{
+        match req.state().storage.search_pins(&username, &search_query.unwrap()) {
+            Err(err) => {
+                error!("Err: {:?}", err);
+                return actix_web::dev::HttpResponseBuilder::new(actix_web::http::StatusCode::OK)
+                    .finish();
+            }
+            Ok(x) => x,
+        }
     };
 
     let pin_count = pins.len();

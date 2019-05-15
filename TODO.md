@@ -3,7 +3,7 @@
 - Implement deleting/trash can
 - Show signup/login errors to user
 - Implement tag-based filtering
-- Implement searching through pins (including tag-filtered searches)
+- Improve UI for searching
 - Clean design of login page
 - Make sure font usage complies with license [https://fontlibrary.org/en/font/glacial-indifference]()
 - Find better design for "add pin" and header sections
@@ -22,7 +22,6 @@
 - Add other sorting mechanisms for pins
 - Add different CSS for "dark mode"
 - Add mobile support to the CSS
-- Make auth cookie survive restarts
 - Finish screenshot taking code. Store PNG image of website, and DOM dump
 - Add "object storage"-based image storing system. Store new images for each pin (don't share them between
   pins, as same URL can have different contents depending on when you take the sshot). Also, store html
