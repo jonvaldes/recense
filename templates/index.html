@@ -1,24 +1,22 @@
 {{>common_header}}
 
-
-	<div id="main_contents">
-		<div id="tag_bar">
-			<h3>Tags</h3>
+<div id="tag_bar_container">
+	<h3>Tags</h3>
+	<div id="tag_bar">
 		{{#each tags}}
 		<a href="/?search={{lookup . 0}}">{{lookup . 0}}({{lookup. 1}})</a>
 		{{/each}}
-		</div>
-
-		<div class="pin_container">
-			{{#if (eq pin_count 0)}}
-				<div class="tutorial">Press Add Pin at the top to add your first pin!</div>
-			{{else}}
-				{{#each pins}}
-					{{> pin}}
-				{{/each}}
-			{{/if}}
-		</div>
 	</div>
+</div>
 
-</body>
-</html>
+<div class="pin_container">
+	{{#if (eq pin_count 0)}}
+		<div class="tutorial">Press Add Pin at the top to add your first pin!</div>
+	{{else}}
+		{{#each pins}}
+			{{> pin}}
+		{{/each}}
+	{{/if}}
+</div>
+{{>common_footer}}
+

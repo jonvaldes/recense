@@ -6,7 +6,7 @@
 - Implement deleting/trash can
 - Show signup/login errors to user
 - Clean design of login page
-- Make sure font usage complies with license [https://fontlibrary.org/en/font/glacial-indifference]()
+- Move all styling to the css file, so every page is consistent
 - Find better design for "add pin" and header sections
 
 ### Medium priority
@@ -22,6 +22,7 @@
 ### Low priority
 - Make the description field support Markdown ??
 - Add other sorting mechanisms for pins
+- Add tag sorting options
 - Add different CSS for "dark mode"
 - Add mobile support to the CSS
 - Finish screenshot taking code. Store PNG image of website, and DOM dump

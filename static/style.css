@@ -1,11 +1,31 @@
+/** Montserrat Regular **/
 @font-face {
-    font-family: "GlacialIndifference";
-    src: url("/static/fonts/GlacialIndifference-Regular.otf") format("opentype");
+    font-family: "Montserrat";
+    font-weight: 400;
+    font-style: normal;
+    src: url("/static/fonts/Montserrat-Regular.eot");
+    src: url("/static/fonts/Montserrat-Regular.eot?#iefix") format('embedded-opentype'),
+         url("/static/fonts/Montserrat-Regular.woff2") format("woff2"),
+         url("/static/fonts/Montserrat-Regular.woff") format("woff");
 }
 
+/** Noto Sans **/
+@font-face {
+    font-family: "NotoSans";
+    font-weight: 400;
+    font-style: normal;
+    src: url("/static/fonts/NotoSans-Regular.eot");
+    src: url("/static/fonts/NotoSans-Regular.woff2") format("woff2"),
+    	 url("/static/fonts/NotoSans-Regular.woff") format("woff");
+}
+
+
 body {
-	font-family: "GlacialIndifference";/*, sans-serif;*/
+	background-color: #fdf9f3;
+	font-family: "NotoSans";/*, sans-serif;*/
 	font-size: large;
+	padding: 0;
+	margin: 0;
 }
 
 h2 {
@@ -25,6 +45,9 @@ input, textarea {
 }
 
 button {
+
+	font-family: "Montserrat";/*, sans-serif;*/
+	font-weight: bold;
 	color: #000;
 	background-color: #eee;
 	border-color: #ccc;
@@ -32,9 +55,10 @@ button {
 	border-radius: 2px;
 }
 
-.header {
+#header {
 	display:flex;
 	flex-direction: row;
+	box-shadow: 2px 0px 8px 0px #aaa;
 }
 
 .tutorial {
@@ -48,35 +72,80 @@ button {
 }
 	
 #add_pin_panel{
-	display: none;
+	position:fixed;
+	bottom: 0;
+	height: 80px;
+	margin: 0;
+	width: 100%;
+	box-shadow: -2px 2px 4px 2px #aaa;
+	background-color: #fff;
+	display:flex;
+	flex-direction:row;
+}
+
+#add_pin_panel h3 {
+	font-family: "Montserrat";/*, sans-serif;*/
+	font-weight: bold;
 }
 
 .pin_container {
 	display: flex;
 	flex-direction: column;
 	align-items: stretch;
+	padding: 0.5em;
 }
 
 .pin {
 	display: block;
-	padding: 0.4em;
-	box-shadow: 2px 2px 4px 2px #aaa;
+	padding: 0.7em;
+	box-shadow: 1px 1px 4px 2px #ccc;
 	margin: 0.5em;
+	font-family: "Montserrat";/*, sans-serif;*/
+}
+
+.pin a {
+	font-size: x-large;
+	color: #339;
+	font-weight: bold;
+	font-family: "NotoSans";/*, sans-serif;*/
+}
+
+.pin a:visited{
+	color: #333;
+}
+
+.pin_tags a {
+	font-size: medium;
+}
+
+.pin_links a{
+	font-size: medium;
+	padding: 0 0.15em ;
 }
 
 .logo {
+	padding: 0.25em 0 ;
+	padding-left: 0.5em;
+	font-family: "Montserrat";/*, sans-serif;*/
+	font-weight: bold;
 	color: #000;
 	font-size: 2em;
 	text-decoration: none;
 }
-#main_contents {
-	flex-direction:row;
+#contents {
+	overflow-y: scroll;
+	height: auto;
+	padding-bottom: 90px;
 }
-#tag_bar {
-	padding: 1em;
+
+#tag_bar_container {
 	float: right;
-	display: flex;
-	flex-direction: column;
-	width: 150px;
+	padding: 1em;
+	width: 300px;
+}
+
+#tag_bar {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
 
 }

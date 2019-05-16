@@ -1,43 +1,36 @@
-	{{>common_header}}
+{{>common_header}}
 
-		<style>
-		#main {
-			width: 1000px;
-			margin: 0 auto;
-		}
-		a {
-			color: #000;
-		}
-		hr {
-			color: #eee;
-		}
+<style>
+	a {
+		color: #000;
+	}
+	hr {
+		color: #eee;
+	}
 
-		#definition{
-			width: 600px;
-			margin: 0 auto;
-		}
-		.def {
-			font-size: 1.5em;
-			font-weight: bold;
-		}
-	</style>
+	#definition{
+		width: 600px;
+		margin: 0 auto;
+	}
+	.def {
+		font-size: 1.5em;
+		font-weight: bold;
+	}
+</style>
 
-		<div id="main">
+<div id="definition">
+	<span class="def">FAQ</span><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;Frequently Answered Questions<br/><br/>
+</div>
 
-		<div id="definition">
-			<span class="def">FAQ</span><br/>
-			&nbsp;&nbsp;&nbsp;&nbsp;Frequently Answered Questions<br/><br/>
-		</div>
+<hr/>
 
-		<hr/>
+<div>
+	This is the current list of things I'm planning on working on for <span
+	   style="font-size:1.5em">Recen.se</span>:<br/>
 
-		<div>
-			This is the current list of things I'm planning on working on for <span
-		 style="font-size:1.5em">Recen.se</span>:<br/>
+   {{{markdown}}}
+</div>
+<hr/>
+{{>common_footer}}
 
-	 	{{{markdown}}}
-		</div>
-		<hr/>
-	</div>
-</body>
-</html>
