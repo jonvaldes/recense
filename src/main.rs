@@ -169,6 +169,7 @@ fn index(req: HttpRequest<AppState>) -> actix_web::HttpResponse {
         "pin_count": pin_count,
         "search_term": search_query.unwrap_or(&String::new()),
         "tags": tags,
+        "logged_in": true,
     });
 
     let contents = match renderer.render_page("index", &index_data) {
@@ -188,6 +189,7 @@ fn markdown_page(
     markdown_filename: &str,
     template_name: &str,
     renderer: &htmlrenderer::HTMLRenderer,
+    logged_in: bool,
 ) -> actix_web::HttpResponse {
     let markdown = match htmlrenderer::render_markdown_file(markdown_filename) {
         Err(err) => {
@@ -197,7 +199,10 @@ fn markdown_page(
         Ok(x) => x,
     };
 
-    let markdown_data = json!({ "markdown": markdown });
+    let markdown_data = json!({ 
+        "markdown": markdown,
+        "logged_in": logged_in,
+    });
 
     let contents = match renderer.render_page(template_name, &markdown_data) {
         Err(err) => {
@@ -215,15 +220,17 @@ fn markdown_page(
 fn todo(req: HttpRequest<AppState>) -> actix_web::HttpResponse {
     use std::borrow::Borrow;
     let renderer: &htmlrenderer::HTMLRenderer = req.state().html_renderer.borrow();
+    let username = req.identity().unwrap_or(String::new());
 
-    markdown_page("TODO.md", "todo", renderer)
+    markdown_page("TODO.md", "todo", renderer, username.len() > 0)
 }
 
 fn faq(req: HttpRequest<AppState>) -> actix_web::HttpResponse {
     use std::borrow::Borrow;
     let renderer: &htmlrenderer::HTMLRenderer = req.state().html_renderer.borrow();
+    let username = req.identity().unwrap_or(String::new());
 
-    markdown_page("FAQ.md", "faq", renderer)
+    markdown_page("FAQ.md", "faq", renderer, username.len() > 0)
 }
 
 fn static_files(req: HttpRequest<AppState>) -> actix_web::Result<NamedFile> {
@@ -259,6 +266,7 @@ fn view_pin(req: HttpRequest<AppState>, path: actix_web::Path<String>) -> actix_
 
     let index_data = json!({
         "pin": pin,
+        "logged_in": true,
     });
 
     let contents = match renderer.render_page("view_pin", &index_data) {
