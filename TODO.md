@@ -1,5 +1,4 @@
 ### High priority
-- Search field doesn't work in TODO or FAQ pages
 - Fix "view pin" layout
 - When you have a search term it shouldn't show the tutorial, but a message saying no results found
 - Create favicon

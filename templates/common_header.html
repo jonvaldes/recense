@@ -8,6 +8,24 @@
 				document.getElementsByTagName("body")[0].style.display = "block";
 			}
 		</script>
+
+		{{#if logged_in}}
+		<script>
+		function onSearchChange() {
+    		var key = window.event.keyCode;
+
+    		// If the user has pressed enter
+    		if (key === 13) {
+        		document.location = "/?search=" + encodeURIComponent(document.getElementById("search_box").value);
+        		return false;
+    		}
+    		else {
+        		return true;
+    		}
+		}
+		</script>
+		{{/if}}
+
 	</head>
 	<body>
 	<div id="header">
