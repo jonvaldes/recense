@@ -1,8 +1,6 @@
 ### High priority
 - Do a common header for all pages, with two modes: signed in and not
-- Make the description field support Markdown
 - Fix "view pin" layout
-- Crop the beginning of the description for the general view.
 - When you have a search term it shouldn't show the tutorial, but a message saying no results found
 - Create favicon
 - Implement pin data editting
@@ -23,6 +21,7 @@
 - Implement downloading your pins in a zip file
 
 ### Low priority
+- Make the description field support Markdown ??
 - Add other sorting mechanisms for pins
 - Add different CSS for "dark mode"
 - Add mobile support to the CSS
