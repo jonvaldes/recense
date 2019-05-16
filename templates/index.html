@@ -4,7 +4,7 @@
 	<h3>Tags</h3>
 	<div id="tag_bar">
 		{{#each tags}}
-		<a href="/?search={{lookup . 0}}">{{lookup . 0}}({{lookup. 1}})</a>
+		<a href="/?search={{lookup . 0}}" style="font-size:{{lookup . 2}}px;">{{lookup . 0}}({{lookup. 1}})</a>
 		{{/each}}
 	</div>
 </div>

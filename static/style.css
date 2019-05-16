@@ -103,15 +103,18 @@ button {
 	font-family: "Montserrat";/*, sans-serif;*/
 }
 
-.pin a {
-	font-size: x-large;
-	color: #339;
-	font-weight: bold;
-	font-family: "NotoSans";/*, sans-serif;*/
+a:visited{
+	color: #333;
 }
 
-.pin a:visited{
-	color: #333;
+a {
+	color: #339;
+}
+	
+.pin a {
+	font-size: x-large;
+	font-weight: bold;
+	font-family: "NotoSans";/*, sans-serif;*/
 }
 
 .pin_tags a {

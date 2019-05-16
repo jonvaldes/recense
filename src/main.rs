@@ -153,13 +153,13 @@ fn index(req: HttpRequest<AppState>) -> actix_web::HttpResponse {
             Ok(x) => x,
         }
     };
-    let tags = match req.state().storage.get_all_tags(&username) {
+    let tags : Vec<(String, usize, usize)>= match req.state().storage.get_all_tags(&username) {
         Err(err) => {
             error!("Err: {:?}", err);
             return actix_web::HttpResponse::InternalServerError().finish();
         },
         Ok(x) => x,
-    };
+    }.iter().map(|(tag,cnt)| (tag.clone(), *cnt, 12 + cnt * 2)).collect() ;
 
 
     let pin_count = pins.len();
