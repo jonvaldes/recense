@@ -8,6 +8,7 @@ pub struct Pin {
     pub id: String,
     pub title: String,
     pub urls: Vec<String>,
+    pub short_description: Option<String>,
     pub description: String,
     pub tags: Vec<String>,
     pub created: DateTime<Utc>,
@@ -20,6 +21,7 @@ impl Pin {
             id: sha1::Sha1::from(format!("{}", now.timestamp_nanos())).hexdigest(),
             title: String::from(""),
             urls: vec![],
+            short_description: Some(String::new()),
             description: String::new(),
             tags: vec![],
             created: now,
@@ -37,6 +39,8 @@ struct DownloadRequest {
 pub struct BackingStore {
     in_channel: mpsc::Sender<DownloadRequest>,
 }
+
+const MAX_SHORT_DESCRIPTION_LENGTH: usize = 70;
 
 impl BackingStore {
     fn downloader_thread(channel: mpsc::Receiver<DownloadRequest>) {
@@ -77,6 +81,17 @@ impl BackingStore {
     }
 
     pub fn add_pin(&self, username: String, pin: Pin) -> Result<(), Error> {
+        let mut pin = pin;
+
+        let short_desc = pin.short_description.clone().unwrap_or(String::new());
+
+        if pin.description.len() > 0 && short_desc.len() == 0 {
+            // Build short description
+            let mut short_desc = String::from(&pin.description[0..MAX_SHORT_DESCRIPTION_LENGTH-1]);
+            short_desc.push('…');
+            pin.short_description = Some(short_desc);
+        }
+
         let pin_json = serde_json::to_string(&pin).unwrap();
         let filename = BackingStore::pin_filename("json", &username, &pin.id);
 
