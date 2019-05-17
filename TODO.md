@@ -2,7 +2,6 @@
 - Find better design for "add pin" and header sections
 - Fix "view pin" layout
 - When you have a search term it shouldn't show the tutorial, but a message saying no results found
-- Create favicon
 - Implement pin data editting
 - Implement deleting/trash can
 - Show signup/login errors to user
