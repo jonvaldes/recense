@@ -161,7 +161,7 @@ fn index(req: HttpRequest<AppState>) -> actix_web::HttpResponse {
         Ok(x) => x,
     }
     .iter()
-    .map(|(tag, cnt)| (tag.clone(), *cnt, 14 + cnt * 2)) // Add font size for tags
+    .map(|(tag, cnt)| (tag.clone(), *cnt, 12 + cnt * 2)) // Add font size for tags
     .collect();
 
     let pin_count = pins.len();

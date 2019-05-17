@@ -1,13 +1,11 @@
 <div class="pin">
-	<div class="pin_title">
-		<a href="{{#if (is_empty_string (lookup urls 0))}}view/{{id}}{{else}}{{lookup urls 0}}{{/if}}">
-			{{#if (is_empty_string title)}}
-				{{lookup urls 0}}
-			{{else}}
-			{{title}}
-			{{/if}}	
-		</a>
-	</div>
+	<a class="pin_title" href="{{#if (is_empty_string (lookup urls 0))}}view/{{id}}{{else}}{{lookup urls 0}}{{/if}}">
+		{{#if (is_empty_string title)}}
+			{{lookup urls 0}}
+		{{else}}
+		{{title}}
+		{{/if}}	
+	</a>
 	<div class="pin_description">
 		{{short_description}}
 	</div>

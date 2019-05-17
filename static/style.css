@@ -54,7 +54,7 @@ input, textarea {
 	border-width: 1px;
 	border-radius:2px;
 	margin: auto;
-	font-size:larger;
+	font-size:medium;
 }
 
 button {
@@ -65,7 +65,7 @@ button {
 	margin: 0.5em;
 	min-width: 5em;
 	display: inline-block;
-	font-size: 1.3em;
+	font-size: 1.0em;
 	color: #000;
 	background-color: #eee;
 	border-color: #ccc;
@@ -110,16 +110,17 @@ form {
 
 .header_section {
 	font-family: "Montserrat";
-	font-size: 1.5em;
+	font-size: 1.2em;
 	font-weight: medium-bold;
 	padding: 0 1em;
-	margin-top: 0.9em;
+	margin-top: 1.3em;
 }
 
 #header input {
+	margin: 0.8em auto;
 	width: 30%;
 	height: 80%;
-	box-shadow: 0px 0px 4px 4px #aaa;
+	box-shadow: inset 0px 0px 4px 4px #eee;
 	background-color: #00000000;
 }
 
@@ -142,6 +143,7 @@ form {
 
 .pin {
 	display: block;
+	font-size: small;
 	padding: 0.7em;
 	box-shadow: 1px 1px 4px 2px #ccc;
 	margin: 0.5em;
@@ -149,20 +151,20 @@ form {
 	line-height: 1.5;
 }
 
-.pin a {
-	font-size: x-large;
+.pin_title {
+	font-size: medium;
 	font-weight: bold;
 	font-family: "NotoSans";/*, sans-serif;*/
 }
 
 .pin_tags a {
 	font-family: IBMPlex;
-	font-size: medium;
+	font-size: small;
 	padding-right: 0.5em;
 }
 
 .pin_links a{
-	font-size: medium;
+	font-size: small;
 	padding: 0 0.15em ;
 }
 
@@ -193,10 +195,14 @@ form {
 	display:flex;
 	flex-direction:row;
 }
+#add_pin_panel button {
+	height: 60%;
+}
 
 #add_pin_panel h3 {
 	font-family: "Montserrat";/*, sans-serif;*/
 	font-weight: bold;
+	font-size: 1.0em;
 	margin: auto 1em;
 }
 
