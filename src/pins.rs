@@ -40,7 +40,7 @@ pub struct BackingStore {
     in_channel: mpsc::Sender<DownloadRequest>,
 }
 
-const MAX_SHORT_DESCRIPTION_LENGTH: usize = 70;
+const MAX_SHORT_DESCRIPTION_LENGTH: usize = 80;
 
 impl BackingStore {
     fn downloader_thread(channel: mpsc::Receiver<DownloadRequest>) {
@@ -53,7 +53,7 @@ impl BackingStore {
             let output =std::process::Command::new("chromium-browser")
                 .arg("--headless")
                 .arg("--disable-gpu")
-                .arg("--window-size=1280,1696")
+                .arg("--window-size=1280,720")
                 .arg("--screenshot")
                 .arg("--dump-dom")
                 .arg(&download_request.url)

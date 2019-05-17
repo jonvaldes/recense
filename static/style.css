@@ -19,6 +19,16 @@
     	 url("/static/fonts/NotoSans-Regular.woff") format("woff");
 }
 
+/** IBM Plex **/
+@font-face {
+    font-family: "IBMPlex";
+    font-weight: 400;
+    font-style: normal;
+    src: url("/static/fonts/IBMPlexSans-Light.eot") format("woff");
+    src: url("/static/fonts/IBMPlexSans-Light.woff2") format("woff2"),
+    	 url("/static/fonts/IBMPlexSans-Light.woff") format("woff");
+
+}
 
 body {
 	font-family: "NotoSans";/*, sans-serif;*/
@@ -107,6 +117,7 @@ button {
 	box-shadow: 1px 1px 4px 2px #ccc;
 	margin: 0.5em;
 	font-family: "Montserrat";/*, sans-serif;*/
+	line-height: 1.5;
 }
 
 	
@@ -117,7 +128,9 @@ button {
 }
 
 .pin_tags a {
+	font-family: IBMPlex;
 	font-size: medium;
+	padding-right: 0.5em;
 }
 
 .pin_links a{
@@ -147,6 +160,7 @@ button {
 }
 
 #tag_bar {
+	font-family: IBMPlex;
 	display: grid;
 	grid-template-columns: 1fr 1fr;
 
