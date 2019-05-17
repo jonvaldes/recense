@@ -1,4 +1,5 @@
 ### High priority
+- Find better design for "add pin" and header sections
 - Fix "view pin" layout
 - When you have a search term it shouldn't show the tutorial, but a message saying no results found
 - Create favicon
@@ -7,7 +8,6 @@
 - Show signup/login errors to user
 - Clean design of login page
 - Move all styling to the css file, so every page is consistent
-- Find better design for "add pin" and header sections
 
 ### Medium priority
 - Make search query persist when adding pins
@@ -24,6 +24,7 @@
 - Add other sorting mechanisms for pins
 - Add tag sorting options
 - Add different CSS for "dark mode"
+	- Move all color settings to a different CSS file, so we only have to switch that one to get different colors
 - Add mobile support to the CSS
 - Finish screenshot taking code. Store PNG image of website, and DOM dump
 - Add "object storage"-based image storing system. Store new images for each pin (don't share them between

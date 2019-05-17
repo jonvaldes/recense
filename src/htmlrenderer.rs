@@ -52,10 +52,6 @@ fn format_datetime(v: &str) -> String {
 handlebars_helper!(format_time: |s: str| format_datetime(s) );
 handlebars_helper!(is_empty_string: |s: str| s == "" );
 
-handlebars_helper!(non_empty_or: |a:str, b: str| if a.len() > 0 { a } else { b } );
-
-handlebars_helper!(concat: |a: str, b: str| format!("{}{}", a, b) );
-
 impl HTMLRenderer {
     pub fn new() -> HTMLRenderer {
         #[cfg(not(debug_assertions))]
@@ -64,8 +60,6 @@ impl HTMLRenderer {
 
             hbars.register_helper("format_time", Box::new(format_time));
             hbars.register_helper("is_empty_string", Box::new(is_empty_string));
-            hbars.register_helper("non_empty_or", Box::new(lookup_or));
-            hbars.register_helper("concat", Box::new(concat));
 
             if let Err(err) = hbars.register_templates_directory(".html", "templates") {
                 error!("Error loading HTML templates: {}", err);

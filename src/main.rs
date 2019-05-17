@@ -89,7 +89,7 @@ fn add_pin(
             .map(|x| String::from(x))
             .collect();
     }
-    
+
     if let Err(err) = state.storage.add_pin(req.identity().unwrap(), pin) {
         error!("Err: {:?}", err);
     }
@@ -153,14 +153,16 @@ fn index(req: HttpRequest<AppState>) -> actix_web::HttpResponse {
             Ok(x) => x,
         }
     };
-    let tags : Vec<(String, usize, usize)>= match req.state().storage.get_all_tags(&username) {
+    let tags: Vec<(String, usize, usize)> = match req.state().storage.get_all_tags(&username) {
         Err(err) => {
             error!("Err: {:?}", err);
             return actix_web::HttpResponse::InternalServerError().finish();
-        },
+        }
         Ok(x) => x,
-    }.iter().map(|(tag,cnt)| (tag.clone(), *cnt, 12 + cnt * 2)).collect() ;
-
+    }
+    .iter()
+    .map(|(tag, cnt)| (tag.clone(), *cnt, 12 + cnt * 2))
+    .collect();
 
     let pin_count = pins.len();
     let index_data = json!({
@@ -199,7 +201,7 @@ fn markdown_page(
         Ok(x) => x,
     };
 
-    let markdown_data = json!({ 
+    let markdown_data = json!({
         "markdown": markdown,
         "logged_in": logged_in,
     });
@@ -248,7 +250,7 @@ fn view_pin(req: HttpRequest<AppState>, path: actix_web::Path<String>) -> actix_
     if username == "" {
         return actix_web::HttpResponse::SeeOther()
             .header(actix_web::http::header::LOCATION, "/")
-            .finish()
+            .finish();
     }
 
     use std::borrow::Borrow;
@@ -260,7 +262,7 @@ fn view_pin(req: HttpRequest<AppState>, path: actix_web::Path<String>) -> actix_
         Err(err) => {
             error!("Err: {:?}", err);
             return actix_web::HttpResponse::NotFound().finish();
-        },
+        }
         Ok(x) => x,
     };
 
@@ -281,10 +283,6 @@ fn view_pin(req: HttpRequest<AppState>, path: actix_web::Path<String>) -> actix_
         .content_type("text/html")
         .body(contents)
 }
-
-
-
-
 
 #[derive(Deserialize)]
 struct SignupInfo {

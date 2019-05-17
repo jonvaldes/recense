@@ -90,8 +90,8 @@ impl BackingStore {
             // Build short description
             let mut short_desc = if pin.description.len() < MAX_SHORT_DESCRIPTION_LENGTH {
                 pin.description.clone()
-            }else{
-                String::from(&pin.description[0..MAX_SHORT_DESCRIPTION_LENGTH-1])
+            } else {
+                String::from(&pin.description[0..MAX_SHORT_DESCRIPTION_LENGTH - 1])
             };
             short_desc.push('…');
             pin.short_description = Some(short_desc);
@@ -146,13 +146,17 @@ impl BackingStore {
     pub fn get_all_tags(&self, username: &str) -> Result<Vec<(String, usize)>, Error> {
         let pins = self.get_all_pins(username)?;
 
-        let mut result = std::collections::HashMap::<String,usize>::new();
-        pins.iter().map(|p| p.tags.clone()).flatten().for_each(|tag|{
-            let counter = result.entry(tag).or_insert(0);
-            *counter += 1;
-        });
+        let mut result = std::collections::HashMap::<String, usize>::new();
+        pins.iter()
+            .map(|p| p.tags.clone())
+            .flatten()
+            .for_each(|tag| {
+                let counter = result.entry(tag).or_insert(0);
+                *counter += 1;
+            });
 
-        let mut result_vec : Vec<(String, usize)>= result.iter().map(|(k,v)| (k.clone(),v.clone())).collect();
+        let mut result_vec: Vec<(String, usize)> =
+            result.iter().map(|(k, v)| (k.clone(), v.clone())).collect();
         result_vec.sort_by(|a, b| a.0.cmp(&b.0));
 
         Ok(result_vec)
@@ -207,21 +211,17 @@ impl BackingStore {
                 let title = p.title.to_lowercase();
 
                 title.contains(&search_pattern)
-                    || p.urls
-                        .iter()
-                        .any(|u| {
-                            let url = u.to_lowercase();
-                            search_terms.clone().all(|term| url.contains(term))
-                        })
+                    || p.urls.iter().any(|u| {
+                        let url = u.to_lowercase();
+                        search_terms.clone().all(|term| url.contains(term))
+                    })
                     || search_terms
                         .clone()
                         .all(|term| p.description.to_lowercase().contains(term))
-                    || p.tags
-                        .iter()
-                        .any(|tag| {
-                            let tag = tag.to_lowercase();
-                            search_terms.clone().all(|term| tag.contains(term))
-                        })
+                    || p.tags.iter().any(|tag| {
+                        let tag = tag.to_lowercase();
+                        search_terms.clone().all(|term| tag.contains(term))
+                    })
             })
             .cloned()
             .collect())
