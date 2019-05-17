@@ -21,13 +21,19 @@
 
 
 body {
-	background-color: #fdf9f3;
 	font-family: "NotoSans";/*, sans-serif;*/
 	font-size: large;
 	padding: 0;
 	margin: 0;
 }
 
+a:visited{
+	color: #333;
+}
+
+a {
+	color: #339;
+}
 h2 {
 	display: inline-block;
 }
@@ -103,13 +109,6 @@ button {
 	font-family: "Montserrat";/*, sans-serif;*/
 }
 
-a:visited{
-	color: #333;
-}
-
-a {
-	color: #339;
-}
 	
 .pin a {
 	font-size: x-large;

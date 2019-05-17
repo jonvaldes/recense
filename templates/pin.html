@@ -1,6 +1,6 @@
 <div class="pin">
 	<div class="pin_title">
-		<a href="{{lookup urls 0}}">
+		<a href="{{#if (is_empty_string (lookup urls 0))}}view/{{id}}{{else}}{{lookup urls 0}}{{/if}}">
 			{{#if (is_empty_string title)}}
 				{{lookup urls 0}}
 			{{else}}

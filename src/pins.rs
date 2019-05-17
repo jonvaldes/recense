@@ -83,13 +83,25 @@ impl BackingStore {
     pub fn add_pin(&self, username: String, pin: Pin) -> Result<(), Error> {
         let mut pin = pin;
 
+        // Fix up short description
         let short_desc = pin.short_description.clone().unwrap_or(String::new());
 
         if pin.description.len() > 0 && short_desc.len() == 0 {
             // Build short description
-            let mut short_desc = String::from(&pin.description[0..MAX_SHORT_DESCRIPTION_LENGTH-1]);
+            let mut short_desc = if pin.description.len() < MAX_SHORT_DESCRIPTION_LENGTH {
+                pin.description.clone()
+            }else{
+                String::from(&pin.description[0..MAX_SHORT_DESCRIPTION_LENGTH-1])
+            };
             short_desc.push('…');
             pin.short_description = Some(short_desc);
+        }
+
+        // Fix up url
+        if pin.urls.len() > 0 && pin.urls[0].len() > 0 {
+            if !(pin.urls[0].starts_with("http://") || pin.urls[0].starts_with("https://")) {
+                pin.urls[0] = format!("http://{}", pin.urls[0]);
+            }
         }
 
         let pin_json = serde_json::to_string(&pin).unwrap();
