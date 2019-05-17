@@ -31,8 +31,8 @@
 	<body>
 	<div id="header">
 		<a href="/" class="logo">Recen.se</a>
-		<a href="/todo">To-Do</a>
-		<a href="/faq">FAQ</a>
+		<a href="/todo" class="header_section">To-Do</a>
+		<a href="/faq" class="header_section">FAQ</a>
 
 		{{#if logged_in}}
 		<input id="search_box" rows=1 placeholder="Search..." onkeydown="onSearchChange();" value="{{search_term}}">

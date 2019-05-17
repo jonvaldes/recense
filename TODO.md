@@ -9,6 +9,7 @@
 - Move all styling to the css file, so every page is consistent
 
 ### Medium priority
+- Add blog section to talk about the project itself?
 - Make search query persist when adding pins
 - Add way to edit user info
 - Add way to delete accounts

@@ -1,4 +1,3 @@
-/** Montserrat Regular **/
 @font-face {
     font-family: "Montserrat";
     font-weight: 400;
@@ -9,7 +8,6 @@
          url("/static/fonts/Montserrat-Regular.woff") format("woff");
 }
 
-/** Noto Sans **/
 @font-face {
     font-family: "NotoSans";
     font-weight: 400;
@@ -19,7 +17,6 @@
     	 url("/static/fonts/NotoSans-Regular.woff") format("woff");
 }
 
-/** IBM Plex **/
 @font-face {
     font-family: "IBMPlex";
     font-weight: 400;
@@ -27,8 +24,9 @@
     src: url("/static/fonts/IBMPlexSans-Light.eot") format("woff");
     src: url("/static/fonts/IBMPlexSans-Light.woff2") format("woff2"),
     	 url("/static/fonts/IBMPlexSans-Light.woff") format("woff");
-
 }
+
+/********************** General *************************/
 
 body {
 	font-family: "NotoSans";/*, sans-serif;*/
@@ -44,11 +42,8 @@ a:visited{
 a {
 	color: #339;
 }
-h2 {
-	display: inline-block;
-}
 
-#logout_form {
+h2 {
 	display: inline-block;
 }
 
@@ -58,12 +53,19 @@ input, textarea {
 	border-color: #bbb;
 	border-width: 1px;
 	border-radius:2px;
+	margin: auto;
+	font-size:larger;
 }
 
 button {
-
 	font-family: "Montserrat";/*, sans-serif;*/
-	font-weight: bold;
+	font-weight: medium-bold;
+	padding: 0.3em;
+	height: 70%;
+	margin: 0.5em;
+	min-width: 5em;
+	display: inline-block;
+	font-size: 1.3em;
 	color: #000;
 	background-color: #eee;
 	border-color: #ccc;
@@ -71,12 +73,57 @@ button {
 	border-radius: 2px;
 }
 
+form {
+	height: 100%;
+}
+
+#contents {
+	height: auto;
+	padding-bottom: 90px;
+	background-color:#fff;
+}
+
+/********************** Header *************************/
+
 #header {
 	display:flex;
 	flex-direction: row;
 	box-shadow: 2px 0px 8px 0px #aaa;
+	height:3.2em;
 }
 
+.logo {
+	padding: 0.25em 0 ;
+	padding-left: 0.5em;
+	font-family: "Montserrat";
+	font-weight: bold;
+	color: #000;
+	font-size: 2em;
+	text-decoration: none;
+	margin-right: 2em;
+	margin-top: 0.2em;
+}
+
+#logout_form {
+	display: inline-block;
+}
+
+.header_section {
+	font-family: "Montserrat";
+	font-size: 1.5em;
+	font-weight: medium-bold;
+	padding: 0 1em;
+	margin-top: 0.9em;
+}
+
+#header input {
+	width: 30%;
+	height: 80%;
+	box-shadow: 0px 0px 4px 4px #aaa;
+	background-color: #00000000;
+}
+
+/********************** Pins *************************/
 .tutorial {
 	font-size: 1.1em;
 	padding:30px;
@@ -84,24 +131,6 @@ button {
 	width: 400px;
 	display:inline-block;
 	margin: 150px 300px;
-
-}
-	
-#add_pin_panel{
-	position:fixed;
-	bottom: 0;
-	height: 80px;
-	margin: 0;
-	width: 100%;
-	box-shadow: -2px 2px 4px 2px #aaa;
-	background-color: #fff;
-	display:flex;
-	flex-direction:row;
-}
-
-#add_pin_panel h3 {
-	font-family: "Montserrat";/*, sans-serif;*/
-	font-weight: bold;
 }
 
 .pin_container {
@@ -120,7 +149,6 @@ button {
 	line-height: 1.5;
 }
 
-	
 .pin a {
 	font-size: x-large;
 	font-weight: bold;
@@ -138,20 +166,7 @@ button {
 	padding: 0 0.15em ;
 }
 
-.logo {
-	padding: 0.25em 0 ;
-	padding-left: 0.5em;
-	font-family: "Montserrat";/*, sans-serif;*/
-	font-weight: bold;
-	color: #000;
-	font-size: 2em;
-	text-decoration: none;
-}
-#contents {
-	overflow-y: scroll;
-	height: auto;
-	padding-bottom: 90px;
-}
+/********************** Tags *************************/
 
 #tag_bar_container {
 	float: right;
@@ -163,5 +178,25 @@ button {
 	font-family: IBMPlex;
 	display: grid;
 	grid-template-columns: 1fr 1fr;
+}	
 
+/********************** Add Pin Panel *************************/
+
+#add_pin_panel{
+	position:fixed;
+	bottom: 0;
+	height: 80px;
+	margin: 0;
+	width: 100%;
+	box-shadow: -2px 2px 4px 2px #aaa;
+	background-color: #fff;
+	display:flex;
+	flex-direction:row;
 }
+
+#add_pin_panel h3 {
+	font-family: "Montserrat";/*, sans-serif;*/
+	font-weight: bold;
+	margin: auto 1em;
+}
+
