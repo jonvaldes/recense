@@ -38,6 +38,8 @@
 	--color:#000;
 	--color-a:#339;
 	--color-a-visited:#333;
+	--color-light-shadow: #eee;
+	--color-shadow: #aaa;
 }
 
 input#theme_switch:checked ~ #top_div{
@@ -45,6 +47,8 @@ input#theme_switch:checked ~ #top_div{
 	--background-color: #222;
 	--color-a:#aae;
 	--color-a-visited:#aaa;
+	--color-light-shadow: #171717;
+	--color-shadow: #151515;
 }
 
 
@@ -74,7 +78,7 @@ h2 {
 }
 
 input, textarea {
-	color: #000;
+	color: var(--color);
 	background-color: var(--background-color);
 	border-color: #bbb;
 	border-width: 1px;
@@ -119,7 +123,7 @@ form {
 #header {
 	display:flex;
 	flex-direction: row;
-	box-shadow: 2px 0px 8px 0px #aaa;
+	box-shadow: 2px 0px 8px 0px var(--color-shadow);
 	background-color:var(--background-color);
 	height:3.2em;
 }
@@ -129,7 +133,7 @@ form {
 	padding-left: 0.5em;
 	font-family: "Montserrat";
 	font-weight: bold;
-	color: #000;
+	color: var(--color);
 	font-size: 2em;
 	text-decoration: none;
 	margin-right: 2em;
@@ -152,7 +156,9 @@ form {
 	margin: 0.8em auto;
 	width: 30%;
 	height: 80%;
-	box-shadow: inset 0px 0px 4px 4px #eee;
+	box-shadow: inset 0px 0px 4px 4px var(--color-light-shadow);
+	padding-left: 1em;
+	border: 1px solid var(--color-shadow);
 	background-color: #00000000;
 }
 
@@ -160,7 +166,7 @@ form {
 .tutorial {
 	font-size: 1.1em;
 	padding:30px;
-	box-shadow: 2px 2px 4px 2px #aaa;
+	box-shadow: 2px 2px 4px 2px var(--color-shadow);
 	width: 400px;
 	display:inline-block;
 	margin: 150px 300px;
@@ -177,7 +183,7 @@ form {
 	display: block;
 	font-size: small;
 	padding: 0.7em;
-	box-shadow: 1px 1px 4px 2px #ccc;
+	box-shadow: 1px 1px 4px 2px var(--color-shadow);
 	margin: 0.5em;
 	font-family: "Montserrat";/*, sans-serif;*/
 	line-height: 1.5;
@@ -236,7 +242,7 @@ form {
 	height: 80px;
 	margin: 0;
 	width: 100%;
-	box-shadow: -2px 2px 4px 2px #aaa;
+	box-shadow: -2px 2px 4px 2px var(--color-shadow);
 	background-color: var(--background-color);
 	display:flex;
 	flex-direction:row;

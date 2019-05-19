@@ -1,5 +1,6 @@
 ### High priority
 - Finish tweaking dark CSS theme
+- Make theme selection persistent (cookie)
 - Find better design for "add pin" and header sections
 - Fix "edit pin" layout
 - When you have a search term it shouldn't show the tutorial, but a message saying no results found

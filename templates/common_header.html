@@ -36,10 +36,10 @@
 		<a href="/" class="logo">Recen.se</a>
 		<a href="/todo" class="header_section">To-Do</a>
 		<a href="/faq" class="header_section">FAQ</a>
-		<label for="theme_switch" style="display:block;">Theme Switch</label>
 
 		{{#if logged_in}}
 		<input id="search_box" rows=1 placeholder="Search..." onkeydown="onSearchChange();" value="{{search_term}}">
+		<label for="theme_switch" style="display:block;">Theme Switch</label>
 		<form id="logout_form" action="/logout" method="POST">
   			<button type="submit">Logout {{username}}</button>
 		</form>
