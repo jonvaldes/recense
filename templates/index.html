@@ -1,12 +1,15 @@
 {{>common_header}}
 
 <div id="tag_bar_container">
+	<div class="rendered_in">Rendered in {{elapsed_time}} ms</div>
+
 	<h3>Tags</h3>
 	<div id="tag_bar">
 		{{#each tags}}
 		<a href="/?search={{lookup . 0}}" style="font-size:{{lookup . 2}}px;">{{lookup . 0}}({{lookup. 1}})</a>
 		{{/each}}
 	</div>
+
 </div>
 
 <div class="pin_container">

@@ -194,6 +194,12 @@ form {
 	grid-template-columns: 1fr 1fr;
 }	
 
+.rendered_in {
+	font-color: #888;
+	font-size:small;
+	float:right;
+}
+
 /********************** Add Pin Panel *************************/
 
 #add_pin_panel{

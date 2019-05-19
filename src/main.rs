@@ -178,6 +178,8 @@ fn login_screen(state: &AppState) -> actix_web::HttpResponse {
 }
 
 fn index(req: HttpRequest<AppState>) -> actix_web::HttpResponse {
+    let time_start = chrono::Local::now();
+
     let username = req.identity().unwrap_or(String::new());
 
     if username == "" {
@@ -230,6 +232,7 @@ fn index(req: HttpRequest<AppState>) -> actix_web::HttpResponse {
         "search_term": search_query.unwrap_or(&String::new()),
         "tags": tags,
         "logged_in": true,
+        "elapsed_time": format!("{:.3}", chrono::Local::now().signed_duration_since(time_start).num_nanoseconds().unwrap() as f32 / 1e6f32),
     });
 
     let contents = match renderer.render_page("index", &index_data) {
@@ -301,7 +304,7 @@ fn static_files(req: HttpRequest<AppState>) -> actix_web::Result<NamedFile> {
     ))?)
 }
 
-fn view_pin(req: HttpRequest<AppState>, path: actix_web::Path<String>) -> actix_web::HttpResponse {
+fn edit_pin_page(req: HttpRequest<AppState>, path: actix_web::Path<String>) -> actix_web::HttpResponse {
     println!("View pin!!!!!!");
     let username = req.identity().unwrap_or(String::new());
 
@@ -324,12 +327,12 @@ fn view_pin(req: HttpRequest<AppState>, path: actix_web::Path<String>) -> actix_
         Ok(x) => x,
     };
 
-    let index_data = json!({
+    let page_data = json!({
         "pin": pin,
         "logged_in": true,
     });
 
-    let contents = match renderer.render_page("view_pin", &index_data) {
+    let contents = match renderer.render_page("edit_pin", &page_data) {
         Err(err) => {
             error!("Err: {:?}", err);
             return actix_web::HttpResponse::InternalServerError().finish();
@@ -437,7 +440,7 @@ fn main() {
             .route("/login", http::Method::POST, login)
             .route("/logout", http::Method::POST, logout)
             .route("/add_pin", http::Method::POST, add_pin)
-            .route("/view/{pin}", http::Method::GET, view_pin)
+            .route("/edit/{pin}", http::Method::GET, edit_pin_page)
             .route("/edit_pin_data", http::Method::POST, edit_pin_data)
     })
     .bind("127.0.0.1:8081")
