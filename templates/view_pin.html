@@ -1,9 +1,12 @@
 {{>common_header}}
 
-	<div>Title <input value="{{pin.title}}"></div>
-	<div>Url <input value="{{lookup pin.urls 0}}"></div>
-	<div>Tags <input value="{{#each pin.tags}}{{.}} {{/each}}"></div>
-	<div>Description <textarea>{{pin.description}}</textarea>
+<form id="edit_pin_form" action="/edit_pin_data" method="POST">
+	<input type="hidden" name="id" value="{{pin.id}}">
+	<div>Title <input type="text" name="title" value="{{pin.title}}"></div>
+	<div>Url <input type="text" name="url" value="{{lookup pin.urls 0}}"></div>
+	<div>Tags <input type="text" name="tags" value="{{#each pin.tags}}{{.}} {{/each}}"></div>
+	<div>Description <textarea form="edit_pin_form">{{pin.description}}</textarea></div>
+	<button type="submit"><i class="fas fa-edit"></i>Save</button>
+</form>
 
-	{{pin.url}}
 {{>common_footer}}

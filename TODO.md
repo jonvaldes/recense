@@ -1,4 +1,5 @@
 ### High priority
+- Make editting a pin not nuke its description
 - Find better design for "add pin" and header sections
 - Rename view pin to edit
 - Fix "edit pin" layout
@@ -10,6 +11,7 @@
 - Move all styling to the css file, so every page is consistent
 
 ### Medium priority
+- Clean up edit_pin_data, it's mostly duplicated code from add_pin
 - Add blog section to talk about the project itself?
 - Make search query persist when adding pins
 - Add way to edit user info

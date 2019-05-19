@@ -55,8 +55,6 @@ fn add_pin(
     state: State<AppState>,
     pin_info: Form<PinInfo>,
 ) -> impl Responder {
-    println!("got to add_pin");
-
     if req.identity() == None {
         error!("add_pin reached without a proper identity");
         return actix_web::HttpResponse::Forbidden().finish();
@@ -65,6 +63,66 @@ fn add_pin(
     let pin_info = pin_info.into_inner();
     println!("Pin info: {:?}", pin_info);
     let mut pin = Pin::new();
+
+    if let Some(title) = pin_info.title {
+        pin.title = title;
+    }
+    if let Some(url) = pin_info.url {
+        pin.urls = vec![url];
+    }
+    if let Some(description) = pin_info.description {
+        pin.description = description;
+    }
+    if let Some(tags) = pin_info.tags {
+        pin.tags = tags
+            .chars()
+            .map(|c| c.to_lowercase().collect::<String>())
+            .collect::<String>()
+            .chars()
+            // I believe we could potentially support weird chars, but this'll do for now
+            .filter(|c| c.is_alphanumeric() || c.is_whitespace() || *c == '_')
+            .collect::<String>()
+            .split_whitespace()
+            .filter(|x| !x.is_empty())
+            .map(|x| String::from(x))
+            .collect();
+    }
+
+    if let Err(err) = state.storage.add_pin(req.identity().unwrap(), pin) {
+        error!("Err: {:?}", err);
+    }
+
+    actix_web::HttpResponse::SeeOther()
+        .header(actix_web::http::header::LOCATION, "/")
+        .finish()
+}
+
+#[derive(Debug, Clone, Deserialize, Serialize)]
+struct EditPinInfo {
+    id: String,
+    title: Option<String>,
+    url: Option<String>,
+    description: Option<String>,
+    tags: Option<String>, // %20-separated
+}
+
+fn edit_pin_data(
+    req: HttpRequest<AppState>,
+    state: State<AppState>,
+    pin_info: Form<EditPinInfo>,
+) -> impl Responder {
+    println!("got to edit_pin");
+
+    if req.identity() == None {
+        error!("edit_pin reached without a proper identity");
+        return actix_web::HttpResponse::Forbidden().finish();
+    }
+
+    let pin_info = pin_info.into_inner();
+    println!("Pin info: {:?}", pin_info);
+    let mut pin = Pin::new();
+
+    pin.id = pin_info.id;
 
     if let Some(title) = pin_info.title {
         pin.title = title;
@@ -380,6 +438,7 @@ fn main() {
             .route("/logout", http::Method::POST, logout)
             .route("/add_pin", http::Method::POST, add_pin)
             .route("/view/{pin}", http::Method::GET, view_pin)
+            .route("/edit_pin_data", http::Method::POST, edit_pin_data)
     })
     .bind("127.0.0.1:8081")
     .unwrap()
