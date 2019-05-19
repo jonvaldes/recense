@@ -8,18 +8,17 @@ Remember this quote?
 Well, I made sure I didn't do any caching for this, but naming I couldn't avoid. And all the "normal" names
 were taken, so here we are.
 
+### Does this website track me?
+Absolutely not. The amount of Javascript this website has is very minimal and unobfuscated, so you can read it
+yourself. The only cookie it stores is for authentication (login/logout). You can even opt out of providing an
+email account, so you can remain 100% anoymous.
+
 ### Is this project open source?
-Not right now. My plan with this was to primarily make a tool for myself. And if other people like it and find
-it useful, maybe run a crowdsourcing thing to cover the costs. And while I love open source (hell, this page
-is built entirely on top of open source tech), maintaining an open source project is a *lot* of work. 
+Not right now. Maintaining an open source project is a *lot* of work, and I'm reluctant to open source this
+project just because of that. 
 
-I already help maintain a quasi-open source project at work, and I don't want to keep doing the same thing
-when I go home. But maybe in the future I could release the source code?. We'll see.
-
-I will at least make sure there's no ads, no tracking and no vendor locking of any kind. Even providing an
-email address when creating an account is completely optional. So even if I don't end up releasing the source
-code, you can be 100% anonymous, your data won't be held hostage, and you can take it out to any other service
-you prefer.
+I already do that kind of work as my day job (community management, design discussions, code reviews, etc),
+and I don't want to keep doing the same thing when I go home. Maybe some day, though.
 
 ### Why the spartan look?
 I'm fed up with pages that take ages to load. This is my attempt at fighting that trend.

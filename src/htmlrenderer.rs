@@ -99,10 +99,8 @@ impl HTMLRenderer {
     }
 }
 
-pub fn render_markdown_file(filename: &str) -> Result<String, Error> {
+pub fn render_markdown_string(markdown_input: &str) -> Result<String, Error> {
     use pulldown_cmark::{html, Options, Parser};
-
-    let markdown_input = std::fs::read_to_string(filename)?;
 
     let parser = Parser::new_ext(&markdown_input, Options::all());
 
@@ -111,4 +109,9 @@ pub fn render_markdown_file(filename: &str) -> Result<String, Error> {
     html::push_html(&mut html_output, parser);
 
     Ok(html_output)
+}
+
+pub fn render_markdown_file(filename: &str) -> Result<String, Error> {
+    let markdown_input = std::fs::read_to_string(filename)?;
+    render_markdown_string(&markdown_input)
 }

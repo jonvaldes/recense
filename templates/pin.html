@@ -1,5 +1,5 @@
 <div class="pin">
-	<a class="pin_title" href="{{#if (is_empty_string (lookup urls 0))}}view/{{id}}{{else}}{{lookup urls 0}}{{/if}}">
+	<a class="pin_title" target="_blank" rel="noopener noreferrer" href="{{#if (is_empty_string (lookup urls 0))}}view/{{id}}{{else}}{{lookup urls 0}}{{/if}}">
 		{{#if (is_empty_string title)}}
 			{{lookup urls 0}}
 		{{else}}
@@ -7,7 +7,11 @@
 		{{/if}}	
 	</a>
 	<div class="pin_description">
-		{{short_description}}
+		{{#if rendered_description}}
+			{{{rendered_description}}}
+		{{else}}
+		<p> {{description}}</p>
+		{{/if}}
 	</div>
 	
 	<div class="pin_tags">
@@ -18,8 +22,8 @@
 	<div class="pin_subtitle">
 	</div>
 	<div class="pin_links">{{format_time created}} 
-		<a href="/view/{{id}}">View</a> 
-		<a href="">Edit</a> 
-		<a href="">Delete</a>
+		<a href="/view/{{id}}"><i class="fas fa-edit"></i></a> 
+		<a href=""><i class="fas fa-trash-alt"></i> </a>
+		
 	</div>
 </div>

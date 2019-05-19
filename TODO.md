@@ -1,6 +1,7 @@
 ### High priority
 - Find better design for "add pin" and header sections
-- Fix "view pin" layout
+- Rename view pin to edit
+- Fix "edit pin" layout
 - When you have a search term it shouldn't show the tutorial, but a message saying no results found
 - Implement pin data editting
 - Implement deleting/trash can
@@ -25,6 +26,7 @@
 - Add tag sorting options
 - Add different CSS for "dark mode"
 	- Move all color settings to a different CSS file, so we only have to switch that one to get different colors
+	(use CSS variables for colors)
 - Add mobile support to the CSS
 - Finish screenshot taking code. Store PNG image of website, and DOM dump
 - Add "object storage"-based image storing system. Store new images for each pin (don't share them between
