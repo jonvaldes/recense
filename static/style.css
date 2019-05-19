@@ -26,7 +26,33 @@
     	 url("/static/fonts/IBMPlexSans-Light.woff") format("woff");
 }
 
+
+/********************** Theme switch *************************/
+#theme_switch {
+	font-size: 3em;
+	margin: 1em;
+}
+
+#top_div {
+	--background-color:#fff;
+	--color:#000;
+	--color-a:#339;
+	--color-a-visited:#333;
+}
+
+input#theme_switch:checked ~ #top_div{
+	--color:#eee;
+	--background-color: #222;
+	--color-a:#aae;
+	--color-a-visited:#aaa;
+}
+
+
+
 /********************** General *************************/
+* {
+  transition: all 0.5s ease;
+}
 
 body {
 	font-family: "NotoSans";/*, sans-serif;*/
@@ -36,11 +62,11 @@ body {
 }
 
 a:visited{
-	color: #333;
+	color:var(--color-a-visited);
 }
 
 a {
-	color: #339;
+	color:var(--color-a);
 }
 
 h2 {
@@ -49,7 +75,7 @@ h2 {
 
 input, textarea {
 	color: #000;
-	background-color: #fff;
+	background-color: var(--background-color);
 	border-color: #bbb;
 	border-width: 1px;
 	border-radius:2px;
@@ -77,10 +103,11 @@ form {
 	height: 100%;
 }
 
-#contents {
+.contents {
+	color: var(--color);
 	height: auto;
 	padding-bottom: 90px;
-	background-color:#fff;
+	background-color:var(--background-color);
 }
 
 .markdown_content {
@@ -93,6 +120,7 @@ form {
 	display:flex;
 	flex-direction: row;
 	box-shadow: 2px 0px 8px 0px #aaa;
+	background-color:var(--background-color);
 	height:3.2em;
 }
 
@@ -209,7 +237,7 @@ form {
 	margin: 0;
 	width: 100%;
 	box-shadow: -2px 2px 4px 2px #aaa;
-	background-color: #fff;
+	background-color: var(--background-color);
 	display:flex;
 	flex-direction:row;
 }

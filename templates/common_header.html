@@ -30,10 +30,13 @@
 
 	</head>
 	<body>
+	<input type="checkbox" id="theme_switch" style="display:none"/> <!-- style="position:absolute; top:-9999px">-->
+	<div id="top_div">
 	<div id="header">
 		<a href="/" class="logo">Recen.se</a>
 		<a href="/todo" class="header_section">To-Do</a>
 		<a href="/faq" class="header_section">FAQ</a>
+		<label for="theme_switch" style="display:block;">Theme Switch</label>
 
 		{{#if logged_in}}
 		<input id="search_box" rows=1 placeholder="Search..." onkeydown="onSearchChange();" value="{{search_term}}">
@@ -43,4 +46,5 @@
 		{{/if}}
 	</div>
 
-	<div id="contents">
+	<div class="contents">
+

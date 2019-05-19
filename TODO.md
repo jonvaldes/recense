@@ -1,4 +1,5 @@
 ### High priority
+- Finish tweaking dark CSS theme
 - Find better design for "add pin" and header sections
 - Fix "edit pin" layout
 - When you have a search term it shouldn't show the tutorial, but a message saying no results found
@@ -23,9 +24,6 @@
 - Expand clickable area of links? (and edit/delete buttons?)
 - Add other sorting mechanisms for pins
 - Add tag sorting options
-- Add different CSS for "dark mode"
-	- Move all color settings to a different CSS file, so we only have to switch that one to get different colors
-	(use CSS variables for colors)
 - Add mobile support to the CSS layout
 - Finish screenshot taking code. Store PNG image of website, and DOM dump
 - Add "object storage"-based image storing system. Store new images for each pin (don't share them between
