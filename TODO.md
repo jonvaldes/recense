@@ -1,5 +1,4 @@
 ### High priority
-- Try making the "confirm delete" button disappear if the trashcan loses focus
 - Finish tweaking dark CSS theme
 - Make dark theme be applied on the first draw
 - Find better design for "add pin" and header sections

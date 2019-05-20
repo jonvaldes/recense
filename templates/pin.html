@@ -1,5 +1,5 @@
 <div class="pin">
-	<a class="pin_title" target="_blank" rel="noopener noreferrer" href="{{#if (is_empty_string (lookup urls 0))}}view/{{id}}{{else}}{{lookup urls 0}}{{/if}}">
+	<a tabindex="1" class="pin_title" target="_blank" rel="noopener noreferrer" href="{{#if (is_empty_string (lookup urls 0))}}view/{{id}}{{else}}{{lookup urls 0}}{{/if}}">
 		{{#if (is_empty_string title)}}
 			{{lookup urls 0}}
 		{{else}}
@@ -23,8 +23,7 @@
 	</div>
 	<div class="pin_links">{{format_time created}} 
 		<a href="/edit/{{id}}"><i class="fas fa-edit"></i></a> 
-		<label for="delete_{{id}}" class="delete_button"><i class="fas fa-trash-alt"></i></label>
-		<input class="delete_button_checkbox" type="checkbox" id="delete_{{id}}"/>
+		<span tabindex="-1" class="delete_button"><i class="fas fa-trash-alt"></i></span>
 		<form action="/delete/{{id}}" method="POST" class="delete_confirm_button">
 			<button type="submit" class="button warning_button">Confirm Delete</button>
 		</form>

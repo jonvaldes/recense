@@ -212,16 +212,22 @@ form {
 	margin: -8px 0;
 }
 
-.delete_button_checkbox {
-	display:none;
-}
-
 .delete_confirm_button {
-	display:none;
+	display: inline-block;
+	transition: visibility 0.2s;
+	visibility:hidden;
 }
 
-.delete_button_checkbox:checked + form {
-	display:inline-block;
+.delete_button:focus{
+	outline: none;
+}
+
+.delete_button:focus i{
+	color:#a72222;
+}
+
+.delete_button:focus + .delete_confirm_button{
+	visibility:visible;
 }
 
 .warning_button {
