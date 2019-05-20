@@ -1,10 +1,10 @@
 ### High priority
+- Try making the "confirm delete" button disappear if the trashcan loses focus
 - Finish tweaking dark CSS theme
 - Make dark theme be applied on the first draw
 - Find better design for "add pin" and header sections
 - Fix "edit pin" layout
 - When you have a search term it shouldn't show the tutorial, but a message saying no results found
-- Implement deleting/trash can
 - Show signup/login errors to user
 - Clean design of login page
 - Move all styling to the css file, so every page is consistent
@@ -12,7 +12,7 @@
 ### Medium priority
 - Clean up edit_pin_data, it's mostly duplicated code from add_pin
 - Add blog section to talk about the project itself?
-- Make search query persist when adding pins
+- Make search query persist when adding/deleting pins
 - Add way to edit user info
 - Add way to delete accounts
 - Add pin pagination

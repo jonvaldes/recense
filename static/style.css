@@ -212,6 +212,24 @@ form {
 	margin: -8px 0;
 }
 
+.delete_button_checkbox {
+	display:none;
+}
+
+.delete_confirm_button {
+	display:none;
+}
+
+.delete_button_checkbox:checked + form {
+	display:inline-block;
+}
+
+.warning_button {
+	background-color: #d72222;
+	border: 0;
+	color: #fff;
+}
+
 /********************** Tags *************************/
 
 #tag_bar_container {

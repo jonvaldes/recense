@@ -61,7 +61,6 @@ fn add_pin(
     }
 
     let pin_info = pin_info.into_inner();
-    println!("Pin info: {:?}", pin_info);
     let mut pin = Pin::new();
 
     if let Some(title) = pin_info.title {
@@ -97,6 +96,24 @@ fn add_pin(
         .finish()
 }
 
+fn delete_pin(req: HttpRequest<AppState>, path: actix_web::Path<String>) -> actix_web::HttpResponse {
+    if req.identity() == None {
+        error!("add_pin reached without a proper identity");
+        return actix_web::HttpResponse::Forbidden().finish();
+    }
+    
+    let pin_id = path;
+
+    let username = req.identity().unwrap();
+    if let Err(err) = req.state().storage.delete_pin(&username, &pin_id) {
+        error!("Err: {:?}", err);
+    }
+
+    actix_web::HttpResponse::SeeOther()
+        .header(actix_web::http::header::LOCATION, "/")
+        .finish()
+}
+
 #[derive(Debug, Clone, Deserialize, Serialize)]
 struct EditPinInfo {
     id: String,
@@ -111,7 +128,6 @@ fn edit_pin_data(
     state: State<AppState>,
     pin_info: Form<EditPinInfo>,
 ) -> impl Responder {
-    println!("got to edit_pin");
 
     if req.identity() == None {
         error!("edit_pin reached without a proper identity");
@@ -119,7 +135,6 @@ fn edit_pin_data(
     }
 
     let pin_info = pin_info.into_inner();
-    println!("Pin info: {:?}", pin_info);
     let mut pin = Pin::new();
 
     pin.id = pin_info.id;
@@ -305,7 +320,6 @@ fn static_files(req: HttpRequest<AppState>) -> actix_web::Result<NamedFile> {
 }
 
 fn edit_pin_page(req: HttpRequest<AppState>, path: actix_web::Path<String>) -> actix_web::HttpResponse {
-    println!("View pin!!!!!!");
     let username = req.identity().unwrap_or(String::new());
 
     if username == "" {
@@ -441,6 +455,7 @@ fn main() {
             .route("/logout", http::Method::POST, logout)
             .route("/add_pin", http::Method::POST, add_pin)
             .route("/edit/{pin}", http::Method::GET, edit_pin_page)
+            .route("/delete/{pin}", http::Method::POST, delete_pin)
             .route("/edit_pin_data", http::Method::POST, edit_pin_data)
     })
     .bind("127.0.0.1:8081")

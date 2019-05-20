@@ -23,7 +23,11 @@
 	</div>
 	<div class="pin_links">{{format_time created}} 
 		<a href="/edit/{{id}}"><i class="fas fa-edit"></i></a> 
-		<a href=""><i class="fas fa-trash-alt"></i> </a>
+		<label for="delete_{{id}}" class="delete_button"><i class="fas fa-trash-alt"></i></label>
+		<input class="delete_button_checkbox" type="checkbox" id="delete_{{id}}"/>
+		<form action="/delete/{{id}}" method="POST" class="delete_confirm_button">
+			<button type="submit" class="button warning_button">Confirm Delete</button>
+		</form>
 		
 	</div>
 </div>

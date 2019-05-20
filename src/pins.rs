@@ -99,7 +99,6 @@ impl BackingStore {
 
         std::fs::create_dir_all(BackingStore::pin_directory(&username))?;
 
-        println!("Filename: {}", filename);
         std::fs::write(filename, &pin_json)?;
 
         if pin.urls.len() > 0 {
@@ -111,6 +110,19 @@ impl BackingStore {
                 })
                 .unwrap();
         }
+
+        Ok(())
+    }
+
+    pub fn delete_pin(&self, username: &str, id: &str) -> Result<(), Error> {
+
+        let filename = BackingStore::pin_filename("json", &username, id);
+
+        if !std::path::Path::new(&filename).exists() {
+            bail!("Pin id {} does not exist", id);
+        }
+
+        std::fs::remove_file(filename)?;
 
         Ok(())
     }
