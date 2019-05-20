@@ -43,10 +43,10 @@
 }
 
 input#theme_switch:checked ~ #top_div{
-	--color:#eee;
+	--color:#f0f0f0;
 	--background-color: #222;
 	--color-a:#aae;
-	--color-a-visited:#aaa;
+	--color-a-visited:#eee;
 	--color-light-shadow: #171717;
 	--color-shadow: #151515;
 }
@@ -54,9 +54,6 @@ input#theme_switch:checked ~ #top_div{
 
 
 /********************** General *************************/
-* {
-  transition: all 0.5s ease;
-}
 
 body {
 	font-family: "NotoSans";/*, sans-serif;*/
@@ -87,15 +84,13 @@ input, textarea {
 	font-size:medium;
 }
 
-button {
+.button {
 	font-family: "Montserrat";/*, sans-serif;*/
-	font-weight: medium-bold;
 	padding: 0.3em;
-	height: 70%;
 	margin: 0.5em;
 	min-width: 5em;
 	display: inline-block;
-	font-size: 1.0em;
+	font-size: 0.9em;
 	color: #000;
 	background-color: #eee;
 	border-color: #ccc;
@@ -128,6 +123,10 @@ form {
 	height:3.2em;
 }
 
+#header .button {
+	height: 60%;
+}
+
 .logo {
 	padding: 0.25em 0 ;
 	padding-left: 0.5em;
@@ -147,7 +146,6 @@ form {
 .header_section {
 	font-family: "Montserrat";
 	font-size: 1.2em;
-	font-weight: medium-bold;
 	padding: 0 1em;
 	margin-top: 1.3em;
 }
@@ -229,7 +227,7 @@ form {
 }	
 
 .rendered_in {
-	font-color: #888;
+	font-color: var(--color);
 	font-size:small;
 	float:right;
 }
@@ -237,6 +235,7 @@ form {
 /********************** Add Pin Panel *************************/
 
 #add_pin_panel{
+	color:var(--color);
 	position:fixed;
 	bottom: 0;
 	height: 80px;
@@ -247,7 +246,8 @@ form {
 	display:flex;
 	flex-direction:row;
 }
-#add_pin_panel button {
+
+#add_pin_panel .button {
 	height: 60%;
 }
 
