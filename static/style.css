@@ -103,6 +103,7 @@ form {
 }
 
 .contents {
+	min-height:100vh;
 	color: var(--color);
 	height: auto;
 	padding-bottom: 90px;
