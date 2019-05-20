@@ -1,12 +1,10 @@
 ### High priority
 - Finish tweaking dark CSS theme
-- Make dark theme be applied on the first draw
 - Find better design for "add pin" and header sections
 - Fix "edit pin" layout
 - When you have a search term it shouldn't show the tutorial, but a message saying no results found
 - Show signup/login errors to user
 - Clean design of login page
-- Move all styling to the css file, so every page is consistent
 
 ### Medium priority
 - Clean up edit_pin_data, it's mostly duplicated code from add_pin

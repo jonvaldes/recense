@@ -32,14 +32,11 @@
 					createCookie("theme", "dark", 30000);
 				}
 			}
-
-			// On document load...
-			window.onload = function(){
+			function checkThemeSwitch(){ 
 				if(readCookie("theme") == "dark") {
 					document.getElementById("theme_switch").checked = true;
 				}
-			};
-
+			}
 		</script>
 
 		{{#if logged_in}}
@@ -62,6 +59,9 @@
 	</head>
 	<body>
 	<input type="checkbox" id="theme_switch" style="display:none" onclick="onThemeSwitchClicked()"/> <!-- style="position:absolute; top:-9999px">-->
+	<script>
+		checkThemeSwitch();
+	</script>
 	<div id="top_div">
 	<div id="header">
 		<a href="/" class="logo">Recen.se</a>
