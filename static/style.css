@@ -111,7 +111,8 @@ form {
 }
 
 .markdown_content {
-	padding: 0.5em 2em ;
+	padding: 0.5em 3em ;
+	width: 75%;
 }
 
 /********************** Header *************************/
