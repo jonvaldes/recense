@@ -1,7 +1,6 @@
 ### High priority
 - Finish tweaking dark CSS theme
 - Find better design for "add pin" and header sections
-- Fix "edit pin" layout
 - When you have a search term it shouldn't show the tutorial, but a message saying no results found
 - Show signup/login errors to user
 - Clean design of login page

@@ -5,8 +5,9 @@
 	<div>Title <input type="text" name="title" value="{{pin.title}}"></div>
 	<div>Url <input type="text" name="url" value="{{lookup pin.urls 0}}"></div>
 	<div>Tags <input type="text" name="tags" value="{{#each pin.tags}}{{.}} {{/each}}"></div>
-	<div>Description <textarea form="edit_pin_form" name="description">{{pin.description}}</textarea></div>
-	<button type="submit"><i class="fas fa-edit"></i>Save</button>
+	<div class="label_top">Description</div> <textarea form="edit_pin_form" name="description">{{pin.description}}</textarea>
+	<br/>
+	<button class="button" type="submit"><i class="fas fa-edit"></i>&nbsp;Save</button>
 </form>
 
 {{>common_footer}}

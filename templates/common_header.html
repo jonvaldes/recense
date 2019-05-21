@@ -24,17 +24,18 @@
 				return null;
 			}
 
+			function checkThemeSwitch(){ 
+				if(readCookie("theme") == "dark") {
+					document.getElementById("theme_switch").checked = true;
+				}
+			}
+
 			function onThemeSwitchClicked() {
 				var current_theme = readCookie("theme");
 				if(current_theme == "dark"){
 					createCookie("theme", "light", 30000);
 				}else{
 					createCookie("theme", "dark", 30000);
-				}
-			}
-			function checkThemeSwitch(){ 
-				if(readCookie("theme") == "dark") {
-					document.getElementById("theme_switch").checked = true;
 				}
 			}
 		</script>
