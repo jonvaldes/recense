@@ -1,4 +1,5 @@
 /auth_cookie_key.bin
+/build_deploy.sh
 /build
 /target
 /users
