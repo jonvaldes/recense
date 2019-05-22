@@ -443,20 +443,54 @@ fn switch_theme(req: HttpRequest<AppState>) -> actix_web::HttpResponse {
         .finish()
 }
 
+fn generate_cookie_key(filename: &str) -> Vec<u8> {
+    let cookie_key = {
+        use rand_pcg::rand_core::RngCore;
+        let mut cookie_key = vec![0u8; 32];
+
+        let timestamp = chrono::Utc::now().timestamp_nanos();
+        rand_pcg::Mcg128Xsl64::new(0x1337f00dd15ea5e5u128 + timestamp as u128)
+            .fill_bytes(&mut cookie_key);
+        cookie_key
+    };
+
+    let mut f = std::fs::File::create(&filename).unwrap();
+    
+    use std::io::Write;
+    f.write_all(&cookie_key).unwrap();
+
+    cookie_key
+}
+
+fn get_cookie_key() -> Vec<u8> {
+    let filename = "auth_cookie_key.bin";
+    
+    if !std::path::Path::new(filename).exists() {
+        return generate_cookie_key(&filename);
+    }
+
+    let f = std::fs::File::open(&filename);
+
+    if f.is_err() {
+        return generate_cookie_key(&filename);
+    }
+
+    use std::io::Read;
+
+    let mut result = Vec::new();
+    if f.unwrap().read_to_end(&mut result).is_err() {
+        return generate_cookie_key(&filename);
+    }
+
+    result
+}
+
 fn main() {
     //std::env::set_var("RUST_LOG", "debug");
     std::env::set_var("RUST_LOG", "recense=debug,actix_web=debug,handlebars=debug");
     env_logger::init();
 
-    let cookie_key = {
-        use rand_pcg::rand_core::RngCore;
-        let mut cookie_key = vec![0u8; 32];
-
-        let timestamp = 0xC0DEFEFEBADC0FFEEu128; //Utc::now().timestamp_nanos();
-        rand_pcg::Mcg128Xsl64::new(0x1337f00dd15ea5e5u128 + timestamp as u128)
-            .fill_bytes(&mut cookie_key);
-        cookie_key
-    };
+    let cookie_key = get_cookie_key();
 
     server::new(move || {
         let initial_state = AppState::new();
