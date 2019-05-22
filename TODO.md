@@ -1,5 +1,4 @@
 ### High priority
-- Finish tweaking dark CSS theme
 - Find better design for "add bookmark" and header sections
 - When you have a search term it shouldn't show the tutorial, but a message saying no results found
 - Show signup/login errors to user
@@ -9,7 +8,7 @@
 - Clean up edit_pin_data, it's mostly duplicated code from add_pin
 - Add blog section to talk about the project itself?
 - Make search query persist when adding/deleting bookmarks 
-- Add way to edit user info
+- Add way to edit user info/password
 - Add way to delete accounts
 - Add bookmark pagination
 - Add server-side logging

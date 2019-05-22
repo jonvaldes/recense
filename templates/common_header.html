@@ -42,30 +42,58 @@
 
 	</head>
 	<body>
-	<input type="checkbox" id="theme_switch" style="display:none"/>
-	<script>
-		checkThemeSwitch();
-	</script>
-	<div id="top_div">
-	<div id="header">
-		<a href="/" class="logo">Recen.se</a>
-		<a href="/todo" class="header_section">To-Do</a>
-		<a href="/faq" class="header_section">FAQ</a>
+		<!-- Invisible checkboxes to toggle features in the website-->
+		<input type="checkbox" id="theme_switch" style="display:none"/>
+		<input type="checkbox" id="add_pin_switch" style="display:none"/>
+		<!-- ^^^^^ -->
+		<script>
+			checkThemeSwitch();
+		</script>
+		<div id="top_div">
+			<div id="header">
+				<a href="/" class="logo">Recen.se</a>
 
-		{{#if logged_in}}
-		<input id="search_box" rows=1 placeholder="Search..." onkeydown="onSearchChange();" value="{{search_term}}">
-		<form class="header_form" action="/switch_theme" method="POST">
-		<button for="theme_switch" class="button theme_switch_button" title="Switch theme">
-			Theme:
-			<i class="fas fa-moon theme_switch_dark"></i>
-			<i class="fas fa-sun theme_switch_light"></i>
-		</button>
-		</form>
-		<form class="header_form" action="/logout" method="POST">
-  			<button type="submit" class="button">Logout {{username}}</button>
-		</form>
-		{{/if}}
-	</div>
+				{{#if logged_in}}
+				<label for="add_pin_switch" class="add_pin_switch_button header_section" title="Add Bookmark">
+					Add Bookmark
+				</label>
+				{{/if}}
 
-	<div class="contents">
+				<a href="/todo" class="header_section">To-Do</a>
+				<a href="/faq" class="header_section">FAQ</a>
+
+				
+				{{#if logged_in}}
+				<input id="search_box" rows=1 placeholder="Search..." onkeydown="onSearchChange();" value="{{search_term}}">
+				<form class="header_form" action="/switch_theme" method="POST">
+					<button for="theme_switch" class="button theme_switch_button" title="Switch theme">
+						Theme:
+						<i class="fas fa-moon theme_switch_dark"></i>
+						<i class="fas fa-sun theme_switch_light"></i>
+					</button>
+				</form>
+				<form class="header_form" action="/logout" method="POST">
+  					<button type="submit" class="button">Logout {{username}}</button>
+				</form>
+				{{/if}}
+			</div>
+
+			{{#if logged_in}}
+			<div id="add_pin_panel" class="add_pin_switch">
+				<label for="add_pin_switch" class="add_pin_switch_button header_section" title="Cancel">
+					<i class="fas fa-times-circle"></i>
+				</label>
+
+				<h3>New Bookmark</h3></span>
+				<form action="/add_pin" method="POST">
+					<input type="text" name="title" placeholder="Title...">
+					<input type="text" name="url" placeholder="Url...">
+					<input type="text" name="description" placeholder="Description...">
+					<input type="text" name="tags" placeholder="Tags...">
+  					<button type="submit" class="button">Add</button>
+				</form>
+			</div>
+			{{/if}}
+
+			<div class="contents">
 
