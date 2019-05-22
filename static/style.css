@@ -156,6 +156,7 @@ form {
 }
 
 .header_section {
+	color: var(--color-a-visited);
 	text-decoration: underline;
 	font-family: "Montserrat";
 	font-size: 1.2em;
