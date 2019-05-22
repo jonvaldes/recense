@@ -79,19 +79,21 @@
 			</div>
 
 			{{#if logged_in}}
-			<div id="add_pin_panel" class="add_pin_switch">
-				<label for="add_pin_switch" class="add_pin_switch_button header_section" title="Cancel">
-					<i class="fas fa-times-circle"></i>
-				</label>
+			<div id="add_pin_panel_wrapper">
+				<div id="add_pin_panel" class="add_pin_switch">
+					<label for="add_pin_switch" class="add_pin_switch_button header_section" title="Cancel">
+						<i class="fas fa-times-circle"></i>
+					</label>
 
-				<h3>New Bookmark</h3></span>
-				<form action="/add_pin" method="POST">
-					<input type="text" name="title" placeholder="Title...">
-					<input type="text" name="url" placeholder="Url...">
-					<input type="text" name="description" placeholder="Description...">
-					<input type="text" name="tags" placeholder="Tags...">
-  					<button type="submit" class="button">Add</button>
-				</form>
+					<h3>New Bookmark</h3></span>
+					<form action="/add_pin" method="POST">
+						<input type="text" name="title" placeholder="Title...">
+						<input type="text" name="url" placeholder="Url...">
+						<input type="text" name="description" placeholder="Description...">
+						<input type="text" name="tags" placeholder="Tags...">
+  						<button type="submit" class="button">Add</button>
+					</form>
+				</div>
 			</div>
 			{{/if}}
 
