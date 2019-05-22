@@ -14,7 +14,11 @@
 
 <div class="pin_container">
 	{{#if (eq pin_count 0)}}
-		<div class="tutorial">Press Add Bookmark at the bottom to add your first bookmark!</div>
+		{{#if (is_empty_string search_term) }}
+			<div class="tutorial">Press Add Bookmark at the top to add your first bookmark!</div>
+		{{else}}
+			<div class="tutorial">No bookmarks found that match search "{{search_term}}"</div>
+		{{/if}}
 	{{else}}
 		{{#each pins}}
 			{{> pin}}

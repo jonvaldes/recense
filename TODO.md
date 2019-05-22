@@ -1,6 +1,5 @@
 ### High priority
-- Find better design for "add bookmark" and header sections
-- When you have a search term it shouldn't show the tutorial, but a message saying no results found
+- Deduplicate tags
 - Show signup/login errors to user
 - Clean design of login page
 
