@@ -96,12 +96,15 @@ fn add_pin(
         .finish()
 }
 
-fn delete_pin(req: HttpRequest<AppState>, path: actix_web::Path<String>) -> actix_web::HttpResponse {
+fn delete_pin(
+    req: HttpRequest<AppState>,
+    path: actix_web::Path<String>,
+) -> actix_web::HttpResponse {
     if req.identity() == None {
         error!("add_pin reached without a proper identity");
         return actix_web::HttpResponse::Forbidden().finish();
     }
-    
+
     let pin_id = path;
 
     let username = req.identity().unwrap();
@@ -128,7 +131,6 @@ fn edit_pin_data(
     state: State<AppState>,
     pin_info: Form<EditPinInfo>,
 ) -> impl Responder {
-
     if req.identity() == None {
         error!("edit_pin reached without a proper identity");
         return actix_web::HttpResponse::Forbidden().finish();
@@ -319,7 +321,10 @@ fn static_files(req: HttpRequest<AppState>) -> actix_web::Result<NamedFile> {
     ))?)
 }
 
-fn edit_pin_page(req: HttpRequest<AppState>, path: actix_web::Path<String>) -> actix_web::HttpResponse {
+fn edit_pin_page(
+    req: HttpRequest<AppState>,
+    path: actix_web::Path<String>,
+) -> actix_web::HttpResponse {
     let username = req.identity().unwrap_or(String::new());
 
     if username == "" {
@@ -420,7 +425,6 @@ fn logout(req: HttpRequest<AppState>) -> actix_web::HttpResponse {
 }
 
 fn switch_theme(req: HttpRequest<AppState>) -> actix_web::HttpResponse {
-
     let current_theme = match req.cookie("theme") {
         Some(x) => String::from(x.value()),
         None => String::new(),
@@ -439,7 +443,12 @@ fn switch_theme(req: HttpRequest<AppState>) -> actix_web::HttpResponse {
 
     actix_web::HttpResponse::SeeOther()
         .header(actix_web::http::header::LOCATION, go_to)
-        .cookie(actix_web::http::Cookie::build("theme", next_theme).secure(false).http_only(false).finish())
+        .cookie(
+            actix_web::http::Cookie::build("theme", next_theme)
+                .secure(false)
+                .http_only(false)
+                .finish(),
+        )
         .finish()
 }
 
@@ -455,7 +464,7 @@ fn generate_cookie_key(filename: &str) -> Vec<u8> {
     };
 
     let mut f = std::fs::File::create(&filename).unwrap();
-    
+
     use std::io::Write;
     f.write_all(&cookie_key).unwrap();
 
@@ -464,7 +473,7 @@ fn generate_cookie_key(filename: &str) -> Vec<u8> {
 
 fn get_cookie_key() -> Vec<u8> {
     let filename = "auth_cookie_key.bin";
-    
+
     if !std::path::Path::new(filename).exists() {
         return generate_cookie_key(&filename);
     }

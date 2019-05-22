@@ -89,10 +89,11 @@ impl BackingStore {
         }
 
         // Generate rendered markdown description
-        pin.rendered_description = match super::htmlrenderer::render_markdown_string(&pin.description) {
-            Err(err) => None,
-            Ok(x) => Some(x),
-        };
+        pin.rendered_description =
+            match super::htmlrenderer::render_markdown_string(&pin.description) {
+                Err(err) => None,
+                Ok(x) => Some(x),
+            };
 
         let pin_json = serde_json::to_string(&pin).unwrap();
         let filename = BackingStore::pin_filename("json", &username, &pin.id);
@@ -115,7 +116,6 @@ impl BackingStore {
     }
 
     pub fn delete_pin(&self, username: &str, id: &str) -> Result<(), Error> {
-
         let filename = BackingStore::pin_filename("json", &username, id);
 
         if !std::path::Path::new(&filename).exists() {
