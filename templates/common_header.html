@@ -5,14 +5,6 @@
   		<link rel="stylesheet" href="/static/fontawesome.min.css" rel="stylesheet">
 		<link rel="stylesheet" type="text/css" href="/static/style.css">
 		<script>
-			// Cookie manipulation, used for theming
-			function createCookie(name,value,days) {
-				var date = new Date();
-				date.setTime(date.getTime()+(days*24*60*60*1000));
-				var expires = "; expires="+date.toGMTString();
-				document.cookie = name+"="+value+expires+"; path=/";
-			}
-
 			function readCookie(name) {
 				var nameEQ = name + "=";
 				var ca = document.cookie.split(';');
@@ -27,15 +19,6 @@
 			function checkThemeSwitch(){ 
 				if(readCookie("theme") == "dark") {
 					document.getElementById("theme_switch").checked = true;
-				}
-			}
-
-			function onThemeSwitchClicked() {
-				var current_theme = readCookie("theme");
-				if(current_theme == "dark"){
-					createCookie("theme", "light", 30000);
-				}else{
-					createCookie("theme", "dark", 30000);
 				}
 			}
 		</script>
@@ -59,7 +42,7 @@
 
 	</head>
 	<body>
-	<input type="checkbox" id="theme_switch" style="display:none" onclick="onThemeSwitchClicked()"/> <!-- style="position:absolute; top:-9999px">-->
+	<input type="checkbox" id="theme_switch" style="display:none"/>
 	<script>
 		checkThemeSwitch();
 	</script>
@@ -71,8 +54,14 @@
 
 		{{#if logged_in}}
 		<input id="search_box" rows=1 placeholder="Search..." onkeydown="onSearchChange();" value="{{search_term}}">
-		<label for="theme_switch" style="display:block;" class="button">Switch Theme</label>
-		<form id="logout_form" action="/logout" method="POST">
+		<form class="header_form" action="/switch_theme" method="POST">
+		<button for="theme_switch" class="button theme_switch_button" title="Switch theme">
+			Theme:
+			<i class="fas fa-moon theme_switch_dark"></i>
+			<i class="fas fa-sun theme_switch_light"></i>
+		</button>
+		</form>
+		<form class="header_form" action="/logout" method="POST">
   			<button type="submit" class="button">Logout {{username}}</button>
 		</form>
 		{{/if}}

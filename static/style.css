@@ -40,6 +40,8 @@
 	--color-a-visited:#333;
 	--color-light-shadow: #eee;
 	--color-shadow: #aaa;
+	--dark-visible-button: none;
+	--light-visible-button: inherit;
 }
 
 input#theme_switch:checked ~ #top_div{
@@ -49,9 +51,9 @@ input#theme_switch:checked ~ #top_div{
 	--color-a-visited:#d7d7d7;
 	--color-light-shadow: #171717;
 	--color-shadow: #151515;
+	--dark-visible-button: inherit;
+	--light-visible-button: none;
 }
-
-
 
 /********************** General *************************/
 
@@ -86,10 +88,12 @@ input, textarea {
 
 .button {
 	font-family: "Montserrat";/*, sans-serif;*/
-	padding: 0.3em;
+	padding: 0.4em 0.6em;
+	line-height:1.3em;
 	margin: 0.5em;
 	min-width: 5em;
-	display: inline-block;
+	display: table-cell;
+	vertical-align: middle;
 	font-size: 0.9em;
 	color: #000;
 	background-color: #eee;
@@ -141,7 +145,7 @@ form {
 	margin-top: 0.2em;
 }
 
-#logout_form {
+.header_form {
 	display: inline-block;
 }
 
@@ -160,6 +164,18 @@ form {
 	padding-left: 1em;
 	border: 1px solid var(--color-shadow);
 	background-color: #00000000;
+}
+
+.theme_switch_dark {
+	display: var(--dark-visible-button);
+}
+
+.theme_switch_light {
+	display: var(--light-visible-button);
+}
+
+.theme_switch_button {
+   	margin: 0.5em;
 }
 
 /********************** Pins *************************/

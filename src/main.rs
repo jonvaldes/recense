@@ -419,6 +419,30 @@ fn logout(req: HttpRequest<AppState>) -> actix_web::HttpResponse {
         .finish()
 }
 
+fn switch_theme(req: HttpRequest<AppState>) -> actix_web::HttpResponse {
+
+    let current_theme = match req.cookie("theme") {
+        Some(x) => String::from(x.value()),
+        None => String::new(),
+    };
+
+    let next_theme = match current_theme.as_ref() {
+        "dark" => "light",
+        "light" => "dark",
+        _ => "dark",
+    };
+
+    let go_to = match req.headers().get(actix_web::http::header::REFERER) {
+        Some(x) => x.to_str().unwrap(),
+        None => "/",
+    };
+
+    actix_web::HttpResponse::SeeOther()
+        .header(actix_web::http::header::LOCATION, go_to)
+        .cookie(actix_web::http::Cookie::build("theme", next_theme).secure(false).http_only(false).finish())
+        .finish()
+}
+
 fn main() {
     //std::env::set_var("RUST_LOG", "debug");
     std::env::set_var("RUST_LOG", "recense=debug,actix_web=debug,handlebars=debug");
@@ -457,6 +481,7 @@ fn main() {
             .route("/edit/{pin}", http::Method::GET, edit_pin_page)
             .route("/delete/{pin}", http::Method::POST, delete_pin)
             .route("/edit_pin_data", http::Method::POST, edit_pin_data)
+            .route("/switch_theme", http::Method::POST, switch_theme)
     })
     .bind("127.0.0.1:8081")
     .unwrap()
