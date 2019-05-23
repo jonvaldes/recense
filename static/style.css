@@ -262,6 +262,18 @@ form {
 	color: #fff;
 }
 
+.pin img {
+	float: left;
+	margin-right: 2em;
+	box-shadow: 1px 1px 3px 3px var(--color-shadow);
+  display:inline-block;
+	max-height:128px;
+	min-height:128px;
+  	min-width:256px;
+  	background:
+    	linear-gradient(to bottom, #fff, #fff, #eee, #aaa);
+}
+
 /********************** Tags *************************/
 
 #tag_bar_container {

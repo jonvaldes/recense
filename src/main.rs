@@ -2,6 +2,7 @@ extern crate actix_web;
 extern crate argon2rs;
 extern crate chrono;
 extern crate env_logger;
+extern crate image;
 extern crate pulldown_cmark;
 extern crate rand_pcg;
 extern crate serde;
@@ -321,6 +322,13 @@ fn static_files(req: HttpRequest<AppState>) -> actix_web::Result<NamedFile> {
     ))?)
 }
 
+fn page_cache(req: HttpRequest<AppState>) -> actix_web::Result<NamedFile> {
+    let path: PathBuf = req.match_info().query("path")?;
+    Ok(NamedFile::open(format!(
+        "cache/{}",
+        path.as_path().to_str().unwrap()
+    ))?)
+}
 fn edit_pin_page(
     req: HttpRequest<AppState>,
     path: actix_web::Path<String>,
@@ -516,6 +524,7 @@ fn main() {
             .route("/", http::Method::GET, index)
             .route("/todo", http::Method::GET, todo)
             .route("/faq", http::Method::GET, faq)
+            .route("/cache/{path:.*}", http::Method::GET, page_cache)
             .route("/static/{path:.*}", http::Method::GET, static_files)
             .route("/signup", http::Method::POST, signup)
             .route("/login", http::Method::POST, login)

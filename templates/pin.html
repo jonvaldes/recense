@@ -1,4 +1,6 @@
 <div class="pin">
+	<img src="/cache/{{../username}}/{{id}}.jpg" alt=" "></img>
+
 	<a tabindex="1" class="pin_title" target="_blank" rel="noopener noreferrer" href="{{#if (is_empty_string (lookup urls 0))}}view/{{id}}{{else}}{{lookup urls 0}}{{/if}}">
 		{{#if (is_empty_string title)}}
 			{{lookup urls 0}}
@@ -13,6 +15,8 @@
 		<p> {{description}}</p>
 		{{/if}}
 	</div>
+
+	<a href="/cache/{{../username}}/{{id}}.html" target="blank">Cached version</a>
 	
 	<div class="pin_tags">
 		{{#each tags}}

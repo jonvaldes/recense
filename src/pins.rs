@@ -40,34 +40,73 @@ pub struct BackingStore {
     in_channel: mpsc::Sender<DownloadRequest>,
 }
 
+
+fn take_screenshot(browser_cmd: &str, req: &DownloadRequest) -> Result<(), Error> {
+
+    // Dump screenshot
+    std::fs::create_dir_all(format!("cache/{}", req.username))?;
+
+    let window_width = 1280;
+    let aspect_ratio = 1.0/2.0;
+    let thumb_ratio = 5;
+    let scrollbar_width = 20;
+
+    let window_height = (window_width as f32 * aspect_ratio) as u32;
+
+    std::fs::remove_file("screenshot.png").unwrap_or(());
+    std::process::Command::new(browser_cmd)
+        .arg("--headless")
+        .arg("--disable-gpu")
+        .arg(format!("--window-size={},{}", window_width, window_height))
+        .arg("--screenshot")
+        .arg(&req.url)
+        .output()?;
+
+    // Move screenshot.png to the right place
+    let screenshot_filename = format!("cache/{}/{}.jpg", &req.username, &req.pin_id);
+    let html_filename = format!("cache/{}/{}.html", &req.username, &req.pin_id);
+
+    {
+        let mut screenshot = image::open("screenshot.png")?;
+        {
+            let cropped_screenshot = image::imageops::crop(&mut screenshot, 0,0, window_width - scrollbar_width, window_height);
+            let thumbnail = image::imageops::thumbnail(&cropped_screenshot, (window_width - scrollbar_width)/thumb_ratio, window_height/thumb_ratio);
+            thumbnail.save(screenshot_filename)?;
+        }
+    }
+    // Dump DOM contents
+    let output = std::process::Command::new(browser_cmd)
+        .arg("--headless")
+        .arg("--disable-gpu")
+        .arg("--dump-dom")
+        .arg(&req.url)
+        .output()?;
+
+    println!("INVOKED");
+
+    if let Err(x) = std::fs::write(html_filename, &output.stdout) {
+        println!("Error writing w3m output: {}", x);
+    }
+
+    Ok(())
+}
+
 impl BackingStore {
     fn downloader_thread(channel: mpsc::Receiver<DownloadRequest>) {
+
+        let browsers = vec!("chromium", "chromium-browser", "google-chrome");
+
         loop {
             let download_request = channel.recv().unwrap();
 
             println!("Getting url: {}", download_request.url);
 
-            /*
-            let output =std::process::Command::new("chromium-browser")
-                .arg("--headless")
-                .arg("--disable-gpu")
-                .arg("--window-size=1280,720")
-                .arg("--screenshot")
-                .arg("--dump-dom")
-                .arg(&download_request.url)
-                .output()
-                .expect("Failed to run chromium");
-
-            // TODO - MOVE screenshot.png to the right place
-
-            let screenshot_filename = BackingStore::pin_filename("png", &download_request.username, &download_request.pin_id);
-
-
-            let filename = BackingStore::pin_filename("html", &download_request.username, &download_request.pin_id);
-            if let Err(x) = std::fs::write(filename, &output.stdout) {
-                println!("Error writing w3m output: {}", x);
+            for browser in &browsers {
+                match take_screenshot(browser, &download_request){
+                    Ok(_) => break,
+                    Err(x) => error!("Error trying to invoke browser: {}\n{}", x, x.backtrace()),
+                }
             }
-            */
         }
     }
 
@@ -91,7 +130,10 @@ impl BackingStore {
         // Generate rendered markdown description
         pin.rendered_description =
             match super::htmlrenderer::render_markdown_string(&pin.description) {
-                Err(err) => None,
+                Err(err) => {
+                    error!("Error rendering markdown description: {}", err);
+                    None
+                },
                 Ok(x) => Some(x),
             };
 

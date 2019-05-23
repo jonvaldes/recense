@@ -4,5 +4,7 @@
 /target
 /users
 /pins
+/cache
+/screenshot.png
 /Cargo.lock
 **/*.rs.bk
