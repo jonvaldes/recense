@@ -60,7 +60,11 @@ fn take_screenshot(browser_cmd: &str, req: &DownloadRequest) -> Result<(), Error
         .arg(format!("--window-size={},{}", window_width, window_height))
         .arg("--screenshot")
         .arg(&req.url)
-        .output()?;
+        .output()
+        .map_err(|e|{
+            error!("Could not execute chromium to extract screenshot {}", e);
+            e
+        })?;
 
     // Move screenshot.png to the right place
     let screenshot_filename = format!("cache/{}/{}.jpg", &req.username, &req.pin_id);
@@ -71,7 +75,12 @@ fn take_screenshot(browser_cmd: &str, req: &DownloadRequest) -> Result<(), Error
         {
             let cropped_screenshot = image::imageops::crop(&mut screenshot, 0,0, window_width - scrollbar_width, window_height);
             let thumbnail = image::imageops::thumbnail(&cropped_screenshot, (window_width - scrollbar_width)/thumb_ratio, window_height/thumb_ratio);
-            thumbnail.save(screenshot_filename)?;
+            thumbnail
+                .save(&screenshot_filename)
+                .map_err(|e|{
+                    error!("Could not save screenshot file to filename {}. Error: {}", screenshot_filename, e);
+                    e
+                })?;
         }
     }
     // Dump DOM contents
@@ -80,13 +89,15 @@ fn take_screenshot(browser_cmd: &str, req: &DownloadRequest) -> Result<(), Error
         .arg("--disable-gpu")
         .arg("--dump-dom")
         .arg(&req.url)
-        .output()?;
+        .output().map_err(|e| {
+            error!("Could not execute chromium to extract html {}", e);
+            e
+        })?;
 
-    println!("INVOKED");
-
-    if let Err(x) = std::fs::write(html_filename, &output.stdout) {
-        println!("Error writing w3m output: {}", x);
-    }
+    std::fs::write(html_filename, &output.stdout).map_err(|e|{
+        error!("Could not write browser's stdout: {}", e);
+        e
+    })?;
 
     Ok(())
 }

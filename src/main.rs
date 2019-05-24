@@ -504,7 +504,8 @@ fn get_cookie_key() -> Vec<u8> {
 
 fn main() {
     //std::env::set_var("RUST_LOG", "debug");
-    std::env::set_var("RUST_LOG", "recense=debug,actix_web=debug,handlebars=debug");
+    //std::env::set_var("RUST_LOG", "recense=debug,actix_web=debug,handlebars=debug");
+    std::env::set_var("RUST_LOG", "recense=debug");
     env_logger::init();
 
     let cookie_key = get_cookie_key();
