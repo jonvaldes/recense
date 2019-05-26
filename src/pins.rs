@@ -40,14 +40,12 @@ pub struct BackingStore {
     in_channel: mpsc::Sender<DownloadRequest>,
 }
 
-
 fn take_screenshot(browser_cmd: &str, req: &DownloadRequest) -> Result<(), Error> {
-
     // Dump screenshot
     std::fs::create_dir_all(format!("cache/{}", req.username))?;
 
     let window_width = 1280;
-    let aspect_ratio = 1.0/2.0;
+    let aspect_ratio = 1.0 / 2.0;
     let thumb_ratio = 5;
     let scrollbar_width = 20;
 
@@ -61,7 +59,7 @@ fn take_screenshot(browser_cmd: &str, req: &DownloadRequest) -> Result<(), Error
         .arg("--screenshot")
         .arg(&req.url)
         .output()
-        .map_err(|e|{
+        .map_err(|e| {
             error!("Could not execute chromium to extract screenshot {}", e);
             e
         })?;
@@ -73,14 +71,25 @@ fn take_screenshot(browser_cmd: &str, req: &DownloadRequest) -> Result<(), Error
     {
         let mut screenshot = image::open("screenshot.png")?;
         {
-            let cropped_screenshot = image::imageops::crop(&mut screenshot, 0,0, window_width - scrollbar_width, window_height);
-            let thumbnail = image::imageops::thumbnail(&cropped_screenshot, (window_width - scrollbar_width)/thumb_ratio, window_height/thumb_ratio);
-            thumbnail
-                .save(&screenshot_filename)
-                .map_err(|e|{
-                    error!("Could not save screenshot file to filename {}. Error: {}", screenshot_filename, e);
-                    e
-                })?;
+            let cropped_screenshot = image::imageops::crop(
+                &mut screenshot,
+                0,
+                0,
+                window_width - scrollbar_width,
+                window_height,
+            );
+            let thumbnail = image::imageops::thumbnail(
+                &cropped_screenshot,
+                (window_width - scrollbar_width) / thumb_ratio,
+                window_height / thumb_ratio,
+            );
+            thumbnail.save(&screenshot_filename).map_err(|e| {
+                error!(
+                    "Could not save screenshot file to filename {}. Error: {}",
+                    screenshot_filename, e
+                );
+                e
+            })?;
         }
     }
     // Dump DOM contents
@@ -89,12 +98,13 @@ fn take_screenshot(browser_cmd: &str, req: &DownloadRequest) -> Result<(), Error
         .arg("--disable-gpu")
         .arg("--dump-dom")
         .arg(&req.url)
-        .output().map_err(|e| {
+        .output()
+        .map_err(|e| {
             error!("Could not execute chromium to extract html {}", e);
             e
         })?;
 
-    std::fs::write(html_filename, &output.stdout).map_err(|e|{
+    std::fs::write(html_filename, &output.stdout).map_err(|e| {
         error!("Could not write browser's stdout: {}", e);
         e
     })?;
@@ -104,8 +114,7 @@ fn take_screenshot(browser_cmd: &str, req: &DownloadRequest) -> Result<(), Error
 
 impl BackingStore {
     fn downloader_thread(channel: mpsc::Receiver<DownloadRequest>) {
-
-        let browsers = vec!("chromium", "chromium-browser", "google-chrome");
+        let browsers = vec!["chromium", "chromium-browser", "google-chrome"];
 
         loop {
             let download_request = channel.recv().unwrap();
@@ -113,7 +122,7 @@ impl BackingStore {
             println!("Getting url: {}", download_request.url);
 
             for browser in &browsers {
-                match take_screenshot(browser, &download_request){
+                match take_screenshot(browser, &download_request) {
                     Ok(_) => break,
                     Err(x) => error!("Error trying to invoke browser: {}\n{}", x, x.backtrace()),
                 }
@@ -144,7 +153,7 @@ impl BackingStore {
                 Err(err) => {
                     error!("Error rendering markdown description: {}", err);
                     None
-                },
+                }
                 Ok(x) => Some(x),
             };
 

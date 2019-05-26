@@ -51,21 +51,28 @@ fn format_datetime(v: &str) -> String {
 
 handlebars_helper!(format_time: |s: str| format_datetime(s) );
 handlebars_helper!(is_empty_string: |s: str| s == "" );
+handlebars_helper!(allow_wrapping: |s: str| String::from(s).replace("_", "<wbr>_"));
 
 impl HTMLRenderer {
+    fn initialize_handlebars() -> handlebars::Handlebars {
+        let mut hbars = handlebars::Handlebars::new();
+
+        hbars.register_helper("format_time", Box::new(format_time));
+        hbars.register_helper("is_empty_string", Box::new(is_empty_string));
+        hbars.register_helper("allow_wrapping", Box::new(allow_wrapping));
+
+        if let Err(err) = hbars.register_templates_directory(".html", "templates") {
+            error!("Error loading HTML templates: {}", err);
+            panic!("no idea what to do now");
+        }
+
+        hbars
+    }
+
     pub fn new() -> HTMLRenderer {
         #[cfg(not(debug_assertions))]
         {
-            let mut hbars = handlebars::Handlebars::new();
-
-            hbars.register_helper("format_time", Box::new(format_time));
-            hbars.register_helper("is_empty_string", Box::new(is_empty_string));
-
-            if let Err(err) = hbars.register_templates_directory(".html", "templates") {
-                error!("Error loading HTML templates: {}", err);
-                panic!("no idea what to do now");
-            }
-
+            let hbars = HTMLRenderer::initialize_handlebars();
             HTMLRenderer { hbars }
         }
 
@@ -82,16 +89,7 @@ impl HTMLRenderer {
 
         #[cfg(debug_assertions)]
         let result = {
-            let mut hbars = handlebars::Handlebars::new();
-
-            hbars.register_helper("format_time", Box::new(format_time));
-            hbars.register_helper("is_empty_string", Box::new(is_empty_string));
-
-            if let Err(err) = hbars.register_templates_directory(".html", "templates") {
-                error!("Error loading HTML templates: {}", err);
-                panic!("no idea what to do now");
-            }
-
+            let hbars = HTMLRenderer::initialize_handlebars();
             hbars.render(filename, &data)?
         };
 

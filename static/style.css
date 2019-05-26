@@ -284,10 +284,16 @@ form {
 
 #tag_bar {
 	font-family: IBMPlex;
-	display: grid;
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
 	grid-template-columns: 1fr 1fr;
+	overflow-wrap: break-word;
 }	
 
+#tag_bar a{
+	margin: 0 0.5em;
+}
 .rendered_in {
 	font-color: var(--color);
 	font-size:small;
