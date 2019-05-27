@@ -253,9 +253,13 @@ fn index(req: HttpRequest<AppState>) -> actix_web::HttpResponse {
                 tag.clone(),
                 *cnt,
                 // Add font size for tags
-                (min_font_size
-                    + log2(cnt) / log2(max_tag_count.unwrap()) * (max_font_size - min_font_size))
-                    as usize,
+                if *max_tag_count.unwrap() == 1 {
+                    ((max_font_size + min_font_size) / 2.0) as usize
+                } else {
+                    (min_font_size
+                        + log2(cnt) / log2(max_tag_count.unwrap())
+                            * (max_font_size - min_font_size)) as usize
+                },
             )
         })
         .collect();
