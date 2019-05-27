@@ -231,16 +231,34 @@ fn index(req: HttpRequest<AppState>) -> actix_web::HttpResponse {
             Ok(x) => x,
         }
     };
-    let tags: Vec<(String, usize, usize)> = match req.state().storage.get_all_tags(&username) {
+
+    let tags_data = match req.state().storage.get_all_tags(&username) {
         Err(err) => {
             error!("Err: {:?}", err);
             return actix_web::HttpResponse::InternalServerError().finish();
         }
         Ok(x) => x,
-    }
-    .iter()
-    .map(|(tag, cnt)| (tag.clone(), *cnt, 12 + cnt * 2)) // Add font size for tags
-    .collect();
+    };
+
+    let max_tag_count = tags_data.iter().map(|(_, cnt)| cnt).max();
+    let min_font_size = 12.0;
+    let max_font_size = 24.0;
+
+    let log2 = |x: &usize| (*x as f32).log2();
+
+    let tags: Vec<(String, usize, usize)> = tags_data
+        .iter()
+        .map(|(tag, cnt)| {
+            (
+                tag.clone(),
+                *cnt,
+                // Add font size for tags
+                (min_font_size
+                    + log2(cnt) / log2(max_tag_count.unwrap()) * (max_font_size - min_font_size))
+                    as usize,
+            )
+        })
+        .collect();
 
     let pin_count = pins.len();
     let index_data = json!({

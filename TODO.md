@@ -1,8 +1,6 @@
 ### High priority
 - Adding a tag containing a dash results in the dash disappearing
-- Make tag sizes be proportional to count, but also capped
 - Add placeholder images while downloading thumbnail or for broken links
-- Fix layout when using long tags
 - Deduplicate tags
 - Show signup/login errors to user
 - Clean design of login page
