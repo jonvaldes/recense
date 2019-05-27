@@ -114,18 +114,27 @@ fn take_screenshot(browser_cmd: &str, req: &DownloadRequest) -> Result<(), Error
 
 impl BackingStore {
     fn downloader_thread(channel: mpsc::Receiver<DownloadRequest>) {
-        let browsers = vec!["chromium", "chromium-browser", "google-chrome"];
+        let browsers = vec![
+            "/usr/bin/chromium",
+            "/usr/bin/chromium-browser",
+            "/usr/bin/google-chrome",
+        ];
+        let mut active_browser = "";
+        for browser in browsers {
+            if std::path::Path::new(&browser).exists() {
+                active_browser = browser;
+                break;
+            }
+        }
 
         loop {
             let download_request = channel.recv().unwrap();
 
             println!("Getting url: {}", download_request.url);
 
-            for browser in &browsers {
-                match take_screenshot(browser, &download_request) {
-                    Ok(_) => break,
-                    Err(x) => error!("Error trying to invoke browser: {}\n{}", x, x.backtrace()),
-                }
+            match take_screenshot(active_browser, &download_request) {
+                Ok(_) => break,
+                Err(x) => error!("Error trying to invoke browser: {}\n{}", x, x.backtrace()),
             }
         }
     }
