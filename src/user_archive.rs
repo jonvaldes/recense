@@ -1,13 +1,12 @@
-use failure::Error;
-use std::path::{Path, PathBuf};
 use crate::pins::BackingStore;
+use failure::Error;
 use std::io::Write;
-
+use std::path::{Path, PathBuf};
 
 fn generate_zip_file(username: &str) -> Result<String, Error> {
-    let buf : Vec<u8> = vec!();
+    let buf: Vec<u8> = vec![];
     let w = std::io::Cursor::new(buf);
-    let mut zip = zip::ZipWriter::new(w); 
+    let mut zip = zip::ZipWriter::new(w);
 
     let file_options = zip::write::FileOptions::default();
 
@@ -19,7 +18,7 @@ fn generate_zip_file(username: &str) -> Result<String, Error> {
     if !dir_path.exists() {
         bail!("No data to archive for user {}", username);
     }
-    
+
     let archive_filename = format!("recense_archive_{}.zip", username);
 
     for file in std::fs::read_dir(dir_path)? {
@@ -39,8 +38,12 @@ fn generate_zip_file(username: &str) -> Result<String, Error> {
         if filename == archive_filename {
             continue;
         }
-      
-        let bytes = std::fs::read(&Path::new(&format!("{}/{}", dir_path.to_str().unwrap(), filename)))?;
+
+        let bytes = std::fs::read(&Path::new(&format!(
+            "{}/{}",
+            dir_path.to_str().unwrap(),
+            filename
+        )))?;
 
         zip.start_file(format!("recense_data/{}", filename), file_options)?;
 
@@ -48,7 +51,7 @@ fn generate_zip_file(username: &str) -> Result<String, Error> {
     }
 
     let zip_data = zip.finish()?;
-  
+
     let mut out_path = PathBuf::from(dir_path);
     out_path.push(&archive_filename);
 
@@ -57,7 +60,6 @@ fn generate_zip_file(username: &str) -> Result<String, Error> {
 }
 
 pub fn generate_archive_for_user(username: String, callback: fn(Result<String, Error>)) {
-
     std::thread::spawn(move || {
         callback(generate_zip_file(&username));
     });

@@ -535,10 +535,12 @@ fn main() {
     std::env::set_var("RUST_LOG", "recense=debug");
     env_logger::init();
 
-
-    user_archive::generate_archive_for_user(String::from("moo1"),  |result: Result<String, Error>|{
-        println!("{:?}", result);
-    });
+    user_archive::generate_archive_for_user(
+        String::from("moo1"),
+        |result: Result<String, Error>| {
+            println!("{:?}", result);
+        },
+    );
 
     let cookie_key = get_cookie_key();
 
