@@ -1,3 +1,7 @@
+### Working on
+- Implement downloading your bookmarks in a zip file
+
+
 ### High priority
 - Adding a tag containing a dash results in the dash disappearing
 - Add placeholder images while downloading thumbnail or for broken links
@@ -16,7 +20,6 @@
 - Add server-side logging
 	- Add performance tracking to see when we start running into issues with that
 - Setup automated backup system
-- Implement downloading your bookmarks in a zip file
 
 ### Low priority
 - Keep track of bookmark creation and modification dates independently?
@@ -28,6 +31,8 @@
 - Warn when adding the same URL twice?
 - Handle failure to download link
 
+### Long-term
+- Implement proper REST API to interact with the data
 
 ## Bulk editing
 Being able to perform operations on many bookmarks sounds like it's gonna be important in the future. Should

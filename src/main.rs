@@ -8,6 +8,7 @@ extern crate pulldown_cmark;
 extern crate rand_pcg;
 extern crate serde;
 extern crate sha1;
+extern crate zip;
 
 #[macro_use]
 extern crate failure;
@@ -20,6 +21,7 @@ extern crate serde_json;
 
 use actix_web::middleware::{identity::RequestIdentity, Logger};
 use actix_web::{fs::NamedFile, http, server, App, Form, HttpRequest, Responder, State};
+use failure::Error;
 //use chrono::prelude::*;
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
@@ -29,6 +31,7 @@ mod downloader;
 mod htmlrenderer;
 mod pins;
 mod user;
+mod user_archive;
 use pins::*;
 
 struct AppState {
@@ -531,6 +534,11 @@ fn main() {
     //std::env::set_var("RUST_LOG", "recense=debug,actix_web=debug,handlebars=debug");
     std::env::set_var("RUST_LOG", "recense=debug");
     env_logger::init();
+
+
+    user_archive::generate_archive_for_user(String::from("moo1"),  |result: Result<String, Error>|{
+        println!("{:?}", result);
+    });
 
     let cookie_key = get_cookie_key();
 
