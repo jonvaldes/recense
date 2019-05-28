@@ -2,6 +2,7 @@ extern crate actix_web;
 extern crate argon2rs;
 extern crate chrono;
 extern crate env_logger;
+extern crate html5ever;
 extern crate image;
 extern crate pulldown_cmark;
 extern crate rand_pcg;
@@ -12,8 +13,6 @@ extern crate sha1;
 extern crate failure;
 #[macro_use]
 extern crate handlebars;
-#[macro_use]
-extern crate html5ever;
 #[macro_use]
 extern crate log;
 #[macro_use]
