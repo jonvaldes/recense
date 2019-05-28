@@ -3,6 +3,8 @@ use failure::Error;
 use serde::{Deserialize, Serialize};
 use std::sync::mpsc;
 
+use crate::downloader::DownloadRequest;
+
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct Pin {
     pub id: String,
@@ -29,119 +31,15 @@ impl Pin {
     }
 }
 
-struct DownloadRequest {
-    url: String,
-    pin_id: String,
-    username: String,
-}
-
 #[derive(Clone)]
 pub struct BackingStore {
     in_channel: mpsc::Sender<DownloadRequest>,
 }
 
-fn take_screenshot(browser_cmd: &str, req: &DownloadRequest) -> Result<(), Error> {
-    // Dump screenshot
-    std::fs::create_dir_all(format!("cache/{}", req.username))?;
-
-    let window_width = 1280;
-    let aspect_ratio = 1.0 / 2.0;
-    let thumb_ratio = 5;
-    let scrollbar_width = 20;
-
-    let window_height = (window_width as f32 * aspect_ratio) as u32;
-
-    std::fs::remove_file("screenshot.png").unwrap_or(());
-    std::process::Command::new(browser_cmd)
-        .arg("--headless")
-        .arg("--disable-gpu")
-        .arg(format!("--window-size={},{}", window_width, window_height))
-        .arg("--screenshot")
-        .arg(&req.url)
-        .output()
-        .map_err(|e| {
-            error!("Could not execute chromium to extract screenshot {}", e);
-            e
-        })?;
-
-    // Move screenshot.png to the right place
-    let screenshot_filename = format!("cache/{}/{}.jpg", &req.username, &req.pin_id);
-    let html_filename = format!("cache/{}/{}.html", &req.username, &req.pin_id);
-
-    {
-        let mut screenshot = image::open("screenshot.png")?;
-        {
-            let cropped_screenshot = image::imageops::crop(
-                &mut screenshot,
-                0,
-                0,
-                window_width - scrollbar_width,
-                window_height,
-            );
-            let thumbnail = image::imageops::thumbnail(
-                &cropped_screenshot,
-                (window_width - scrollbar_width) / thumb_ratio,
-                window_height / thumb_ratio,
-            );
-            thumbnail.save(&screenshot_filename).map_err(|e| {
-                error!(
-                    "Could not save screenshot file to filename {}. Error: {}",
-                    screenshot_filename, e
-                );
-                e
-            })?;
-        }
-    }
-    // Dump DOM contents
-    let output = std::process::Command::new(browser_cmd)
-        .arg("--headless")
-        .arg("--disable-gpu")
-        .arg("--dump-dom")
-        .arg(&req.url)
-        .output()
-        .map_err(|e| {
-            error!("Could not execute chromium to extract html {}", e);
-            e
-        })?;
-
-    std::fs::write(html_filename, &output.stdout).map_err(|e| {
-        error!("Could not write browser's stdout: {}", e);
-        e
-    })?;
-
-    Ok(())
-}
-
 impl BackingStore {
-    fn downloader_thread(channel: mpsc::Receiver<DownloadRequest>) {
-        let browsers = vec![
-            "/usr/bin/chromium",
-            "/usr/bin/chromium-browser",
-            "/usr/bin/google-chrome",
-        ];
-        let mut active_browser = "";
-        for browser in browsers {
-            if std::path::Path::new(&browser).exists() {
-                active_browser = browser;
-                break;
-            }
-        }
-
-        loop {
-            let download_request = channel.recv().unwrap();
-
-            println!("Getting url: {}", download_request.url);
-
-            match take_screenshot(active_browser, &download_request) {
-                Ok(_) => break,
-                Err(x) => error!("Error trying to invoke browser: {}\n{}", x, x.backtrace()),
-            }
-        }
-    }
-
     pub fn new() -> BackingStore {
         let (in_channel, out_channel) = mpsc::channel();
-        std::thread::spawn(move || BackingStore::downloader_thread(out_channel));
+        std::thread::spawn(move || crate::downloader::downloader_thread(out_channel));
 
         BackingStore { in_channel }
     }

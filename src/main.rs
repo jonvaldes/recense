@@ -13,6 +13,8 @@ extern crate failure;
 #[macro_use]
 extern crate handlebars;
 #[macro_use]
+extern crate html5ever;
+#[macro_use]
 extern crate log;
 #[macro_use]
 extern crate serde_json;
@@ -24,6 +26,7 @@ use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 use std::rc::Rc;
 
+mod downloader;
 mod htmlrenderer;
 mod pins;
 mod user;
