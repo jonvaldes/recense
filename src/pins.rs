@@ -100,7 +100,7 @@ impl BackingStore {
         format!("pins/{}/{}_v0.{}", username, id, extension)
     }
 
-    fn pin_directory(username: &str) -> String {
+    pub fn pin_directory(username: &str) -> String {
         format!("pins/{}/", username)
     }
 

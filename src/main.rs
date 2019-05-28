@@ -8,6 +8,7 @@ extern crate pulldown_cmark;
 extern crate rand_pcg;
 extern crate serde;
 extern crate sha1;
+extern crate zip;
 
 #[macro_use]
 extern crate failure;
@@ -29,6 +30,7 @@ mod downloader;
 mod htmlrenderer;
 mod pins;
 mod user;
+mod user_archive;
 use pins::*;
 
 struct AppState {
@@ -346,6 +348,24 @@ fn static_files(req: HttpRequest<AppState>) -> actix_web::Result<NamedFile> {
     ))?)
 }
 
+fn download_archive(req: HttpRequest<AppState>) -> actix_web::Result<NamedFile> {
+    let username = req.identity().unwrap_or(String::new());
+
+    if username == "" {
+        return Err(format_err!("Can't access this without being logged-in").into());
+    }
+
+    let zip_file = match user_archive::generate_archive_for_user(username) {
+        Ok(x) => x,
+        Err(err) => {
+            error!("Err: {:?}", err);
+            return Err(format_err!("Error, could not generate archive").into());
+        }
+    };
+
+    Ok(NamedFile::open(zip_file)?)
+}
+
 fn page_cache(req: HttpRequest<AppState>) -> actix_web::Result<NamedFile> {
     let path: PathBuf = req.match_info().query("path")?;
     Ok(NamedFile::open(format!(
@@ -353,6 +373,7 @@ fn page_cache(req: HttpRequest<AppState>) -> actix_web::Result<NamedFile> {
         path.as_path().to_str().unwrap()
     ))?)
 }
+
 fn edit_pin_page(
     req: HttpRequest<AppState>,
     path: actix_web::Path<String>,
@@ -559,6 +580,7 @@ fn main() {
             .route("/delete/{pin}", http::Method::POST, delete_pin)
             .route("/edit_pin_data", http::Method::POST, edit_pin_data)
             .route("/switch_theme", http::Method::POST, switch_theme)
+            .route("/user_archive", http::Method::GET, download_archive)
     })
     .bind("127.0.0.1:8081")
     .unwrap()
