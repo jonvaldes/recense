@@ -1,7 +1,3 @@
-### Working on
-- Implement downloading your bookmarks in a zip file
-
-
 ### High priority
 - Adding a tag containing a dash results in the dash disappearing
 - Add placeholder images while downloading thumbnail or for broken links

@@ -3,16 +3,8 @@ use failure::Error;
 use std::io::Write;
 use std::path::{Path, PathBuf};
 
-fn generate_zip_file(username: &str) -> Result<String, Error> {
-    let buf: Vec<u8> = vec![];
-    let w = std::io::Cursor::new(buf);
-    let mut zip = zip::ZipWriter::new(w);
-
-    let file_options = zip::write::FileOptions::default();
-
-    zip.add_directory("recense_data", file_options)?;
-
-    let dir_str = BackingStore::pin_directory(username);
+pub fn generate_archive_for_user(username: String) -> Result<PathBuf, Error> {
+    let dir_str = BackingStore::pin_directory(&username);
     let dir_path = Path::new(&dir_str);
 
     if !dir_path.exists() {
@@ -20,6 +12,20 @@ fn generate_zip_file(username: &str) -> Result<String, Error> {
     }
 
     let archive_filename = format!("recense_archive_{}.zip", username);
+    let mut out_path = PathBuf::from(dir_path);
+    out_path.push(&archive_filename);
+
+    if out_path.exists() {
+        let _ = std::fs::remove_file(&out_path);
+    }
+
+    let buf: Vec<u8> = vec![];
+    let w = std::io::Cursor::new(buf);
+    let mut zip = zip::ZipWriter::new(w);
+
+    let file_options = zip::write::FileOptions::default();
+
+    zip.add_directory("recense_data", file_options)?;
 
     for file in std::fs::read_dir(dir_path)? {
         if !file.is_ok() {
@@ -33,7 +39,7 @@ fn generate_zip_file(username: &str) -> Result<String, Error> {
             continue;
         }
 
-        let filename = String::from(filename_opt.unwrap().to_str().unwrap());
+        let filename = filename_opt.unwrap().to_str().unwrap().to_string();
 
         if filename == archive_filename {
             continue;
@@ -52,15 +58,6 @@ fn generate_zip_file(username: &str) -> Result<String, Error> {
 
     let zip_data = zip.finish()?;
 
-    let mut out_path = PathBuf::from(dir_path);
-    out_path.push(&archive_filename);
-
     std::fs::write(&out_path, zip_data.get_ref())?;
-    Ok(archive_filename)
-}
-
-pub fn generate_archive_for_user(username: String, callback: fn(Result<String, Error>)) {
-    std::thread::spawn(move || {
-        callback(generate_zip_file(&username));
-    });
+    Ok(PathBuf::from(out_path))
 }

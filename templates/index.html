@@ -1,8 +1,10 @@
 {{>common_header}}
 
 <div id="tag_bar_container">
-	<div class="rendered_in">Rendered in {{elapsed_time}} ms</div>
-
+	<div class="rendered_in">
+		<div>Rendered in {{elapsed_time}} ms</div>
+		<a href="/user_archive">Download all as zip file</a>
+	</div>
 	<h3>Tags</h3>
 	<div id="tag_bar">
 		{{#each tags}}
