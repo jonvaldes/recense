@@ -348,22 +348,42 @@ fn static_files(req: HttpRequest<AppState>) -> actix_web::Result<NamedFile> {
     ))?)
 }
 
-fn download_archive(req: HttpRequest<AppState>) -> actix_web::Result<NamedFile> {
+fn download_archive(req: HttpRequest<AppState>) -> actix_web::HttpResponse {
     let username = req.identity().unwrap_or(String::new());
 
     if username == "" {
-        return Err(format_err!("Can't access this without being logged-in").into());
+        return actix_web::HttpResponse::SeeOther()
+            .header(actix_web::http::header::LOCATION, "/")
+            .finish();
     }
 
-    let zip_file = match user_archive::generate_archive_for_user(username) {
+    let zip_file_contents = match user_archive::generate_archive_for_user(username) {
         Ok(x) => x,
         Err(err) => {
             error!("Err: {:?}", err);
-            return Err(format_err!("Error, could not generate archive").into());
+            return actix_web::HttpResponse::InternalServerError().finish();
         }
     };
 
-    Ok(NamedFile::open(zip_file)?)
+    use actix_web::http::header::*;
+
+    let content_disposition = ContentDisposition {
+        disposition: DispositionType::Attachment,
+        parameters: vec![DispositionParam::FilenameExt(ExtendedValue {
+            charset: Charset::Iso_8859_1,
+            language_tag: None,
+            value: b"recense_user_archive.zip".to_vec(), // the actual bytes of the filename
+        })],
+    };
+
+    actix_web::HttpResponse::Ok()
+        .header(
+            actix_web::http::header::CONTENT_DISPOSITION,
+            content_disposition,
+        )
+        .content_type("application/zip")
+        .content_length(zip_file_contents.len() as u64)
+        .body(zip_file_contents)
 }
 
 fn page_cache(req: HttpRequest<AppState>) -> actix_web::Result<NamedFile> {
