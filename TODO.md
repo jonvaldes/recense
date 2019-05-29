@@ -1,10 +1,8 @@
 ### High priority
 - Adding a tag containing a dash results in the dash disappearing
 - Add placeholder images while downloading thumbnail or for broken links
-- Deduplicate tags
 - Show signup/login errors to user
 - Clean design of login page
-- Use an html parser (html5ever?) to convert all local references in stored html code into global references
 
 ### Medium priority
 - Clean up edit_pin_data, it's mostly duplicated code from add_pin

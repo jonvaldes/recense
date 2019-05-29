@@ -90,6 +90,10 @@ fn add_pin(
             .filter(|x| !x.is_empty())
             .map(|x| String::from(x))
             .collect();
+
+        // Deduplicate tags
+        pin.tags.sort_unstable();
+        pin.tags.dedup();
     }
 
     if let Err(err) = state.storage.add_pin(req.identity().unwrap(), pin) {
@@ -168,6 +172,10 @@ fn edit_pin_data(
             .filter(|x| !x.is_empty())
             .map(|x| String::from(x))
             .collect();
+
+        // Deduplicate tags
+        pin.tags.sort_unstable();
+        pin.tags.dedup();
     }
 
     if let Err(err) = state.storage.add_pin(req.identity().unwrap(), pin) {
