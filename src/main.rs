@@ -1,7 +1,7 @@
 extern crate actix_web;
 extern crate argon2rs;
 extern crate chrono;
-extern crate env_logger;
+extern crate fern;
 extern crate html5ever;
 extern crate image;
 extern crate pulldown_cmark;
@@ -26,6 +26,7 @@ use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 use std::rc::Rc;
 
+mod errors;
 mod downloader;
 mod htmlrenderer;
 mod pins;
@@ -52,7 +53,7 @@ struct PinInfo {
     title: Option<String>,
     url: Option<String>,
     description: Option<String>,
-    tags: Option<String>, // %20-separated
+    tags: Option<String>,
 }
 
 fn add_pin(
@@ -132,7 +133,7 @@ struct EditPinInfo {
     title: Option<String>,
     url: Option<String>,
     description: Option<String>,
-    tags: Option<String>, // %20-separated
+    tags: Option<String>,
 }
 
 fn edit_pin_data(
@@ -396,6 +397,11 @@ fn download_archive(req: HttpRequest<AppState>) -> actix_web::HttpResponse {
 
 fn page_cache(req: HttpRequest<AppState>) -> actix_web::Result<NamedFile> {
     let path: PathBuf = req.match_info().query("path")?;
+    let actual_path = format!("cache/{}", path.as_path().to_str().unwrap());
+    if !std::path::Path::new(&actual_path).exists() {
+        return Err(actix_web::error::ErrorNotFound(failure::err_msg("File not found")));
+    }
+
     Ok(NamedFile::open(format!(
         "cache/{}",
         path.as_path().to_str().unwrap()
@@ -576,10 +582,27 @@ fn get_cookie_key() -> Vec<u8> {
 }
 
 fn main() {
-    //std::env::set_var("RUST_LOG", "debug");
-    //std::env::set_var("RUST_LOG", "recense=debug,actix_web=debug,handlebars=debug");
-    std::env::set_var("RUST_LOG", "recense=debug");
-    env_logger::init();
+
+    // Configure logger at runtime
+    fern::Dispatch::new()
+        .format(|out, message, record| {
+            out.finish(format_args!(
+                    "{}[{}][{}] {}",
+                    chrono::Local::now().format("[%Y-%m-%d][%H:%M:%S]"),
+                    record.target(),
+                    record.level(),
+                    message
+            ))
+        })
+    .level(log::LevelFilter::Debug)
+        .level_for("handlebars", log::LevelFilter::Error)
+        .level_for("html5ever", log::LevelFilter::Error)
+        .level_for("actix_web", log::LevelFilter::Error)
+        .level_for("tokio_reactor", log::LevelFilter::Error)
+        .chain(std::io::stdout())
+        .chain(fern::log_file("recense.log").unwrap())
+        .apply()
+        .unwrap();
 
     let cookie_key = get_cookie_key();
 

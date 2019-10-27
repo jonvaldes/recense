@@ -1,6 +1,13 @@
+### Next
+- Switch from chromium browsers to firefox for screenshots and caching. Chromium is extremely unreliable, and
+  hangs while taking screenshots.
+  - Use mozrunner to control the firefox process: https://crates.io/crates/mozrunner
+  - Implement minimal Marionette support in recense to extract screenshots and the DOM for caching
+
+- Add reloading mechanism for the screenshots, so they load automatically when they're ready
+
 ### High priority
 - Adding a tag containing a dash results in the dash disappearing
-- Add placeholder images while downloading thumbnail or for broken links
 - Show signup/login errors to user
 - Clean design of login page
 

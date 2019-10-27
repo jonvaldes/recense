@@ -1,6 +1,7 @@
 use actix_web::http;
 use failure::Error;
 use std::sync::mpsc;
+use crate::errors::Context;
 
 pub struct DownloadRequest {
     pub url: String,
@@ -8,7 +9,7 @@ pub struct DownloadRequest {
     pub username: String,
 }
 
-fn take_screenshot(browser_cmd: &str, req: &DownloadRequest) -> Result<(), Error> {
+fn take_screenshot(req: &DownloadRequest) -> Result<(), Error> {
     // Dump screenshot
     std::fs::create_dir_all(format!("cache/{}", req.username))?;
 
@@ -20,23 +21,32 @@ fn take_screenshot(browser_cmd: &str, req: &DownloadRequest) -> Result<(), Error
     let window_height = (window_width as f32 * aspect_ratio) as u32;
 
     std::fs::remove_file("screenshot.png").unwrap_or(());
-    std::process::Command::new(browser_cmd)
+    let output = std::process::Command::new("/usr/bin/firefox")
         .arg("--headless")
-        .arg("--disable-gpu")
         .arg(format!("--window-size={},{}", window_width, window_height))
         .arg("--screenshot")
+        .arg("screenshot.png")
         .arg(&req.url)
         .output()
         .map_err(|e| {
-            error!("Could not execute chromium to extract screenshot {}", e);
+            error!("Could not execute browser to extract screenshot {}", e);
             e
         })?;
 
+    if output.stdout.len() > 0 {
+        info!("Output from browser: {}", std::str::from_utf8(&output.stdout).unwrap_or("COULD NOT READ STDOUT"));
+    }
+
+
+    if output.stderr.len() > 0 {
+        error!("Errors from browser: {}", std::str::from_utf8(&output.stderr).unwrap_or("COULD NOT READ STDERR"));
+    }
+
     // Move screenshot.png to the right place
-    let screenshot_filename = format!("cache/{}/{}.jpg", &req.username, &req.pin_id);
 
     {
-        let mut screenshot = image::open("screenshot.png")?;
+        let mut screenshot = image::open("screenshot.png")
+            .with_context(|| "Could not open generated screenshot.png file")?;
         {
             let cropped_screenshot = image::imageops::crop(
                 &mut screenshot,
@@ -50,6 +60,7 @@ fn take_screenshot(browser_cmd: &str, req: &DownloadRequest) -> Result<(), Error
                 (window_width - scrollbar_width) / thumb_ratio,
                 window_height / thumb_ratio,
             );
+            let screenshot_filename = format!("cache/{}/{}.jpg", &req.username, &req.pin_id);
             thumbnail.save(&screenshot_filename).map_err(|e| {
                 error!(
                     "Could not save screenshot file to filename {}. Error: {}",
@@ -82,7 +93,6 @@ fn fix_html_references(handle: &mut html5ever::rcdom::Handle, server_url: &str) 
                                 server_url, attr.value
                             ));
                         }
-                        println!(" {}=\"{}\"", attr.name.local, attr.value);
                     }
                 }
             }
@@ -154,37 +164,31 @@ fn download_link_source(browser_cmd: &str, req: &DownloadRequest) -> Result<(), 
 }
 
 pub fn downloader_thread(channel: mpsc::Receiver<DownloadRequest>) {
-    let browsers = vec![
+    let active_browser = [
+        "/usr/bin/google-chrome",
         "/usr/bin/chromium",
         "/usr/bin/chromium-browser",
-        "/usr/bin/google-chrome",
-    ];
-    let mut active_browser = "";
-    for browser in browsers {
-        if std::path::Path::new(&browser).exists() {
-            active_browser = browser;
-            break;
-        }
-    }
-
+    ]
+        .iter()
+        .find(|browser| std::path::Path::new(&browser).exists())
+        .ok_or_else(|| panic!("Could not find any installed chromium-based browser to take screenshots of sites"))
+        .unwrap();
+    
     loop {
         let download_request = channel.recv().unwrap();
 
         println!("Getting url: {}", download_request.url);
 
-        let sshot_result = take_screenshot(active_browser, &download_request);
-        let source_result = download_link_source(active_browser, &download_request);
-
-        if let Err(x) = sshot_result {
+        if let Err(err) = take_screenshot(&download_request) {
             error!(
                 "Error trying to generate screenshot: {}\n{}",
-                x,
-                x.backtrace()
-            );
+                err,
+                err.backtrace()
+            )
         }
 
-        if let Err(x) = source_result {
-            error!("Error trying to download source: {}\n{}", x, x.backtrace());
+        if let Err(err) = download_link_source(&active_browser, &download_request) {
+            error!("Error trying to download source: {}\n{}", err, err.backtrace())
         }
     }
 }
