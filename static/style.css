@@ -96,7 +96,6 @@ input, textarea {
 	font-family: "Montserrat";/*, sans-serif;*/
 	padding: 0.4em 0.6em;
 	line-height:1.3em;
-	margin: 0.5em;
 	min-width: 5em;
 	display: table-cell;
 	vertical-align: middle;
@@ -106,10 +105,6 @@ input, textarea {
 	border-color: #ccc;
 	border-width: 1.5px;
 	border-radius: 2px;
-}
-
-form {
-	height: 100%;
 }
 
 .contents {
@@ -128,31 +123,42 @@ form {
 /********************** Header *************************/
 
 #header {
-	display:flex;
-	flex-direction: row;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
 	box-shadow: 2px 0px 8px 0px var(--color-shadow);
-	background-color:var(--background-color);
-	height:var(--header-height);
+	background-color: var(--background-color);
+	height: var(--header-height);
+	padding: 5px;
 }
 
 #header .button {
-	height: 60%;
+	height: 40px;
 }
 
 .logo {
-	padding: 0.25em 0 ;
-	padding-left: 0.5em;
 	font-family: "Montserrat";
 	font-weight: bold;
 	color: var(--color);
 	font-size: 2em;
 	text-decoration: none;
-	margin-right: 2em;
-	margin-top: 0.2em;
+	margin-left: 10px;
+	margin-right: 50px;
 }
 
 .header_form {
-	display: inline-block;
+	margin: 0 0.5em;
+}
+
+#search_form {
+	flex-grow: 1;
+	text-align: center;
+}
+#search_box {
+	width: 100%;
+	max-width: 750px;
+	height: 40px;
+	font-size: 150%;
 }
 
 .header_section {
@@ -161,15 +167,13 @@ form {
 	font-family: "Montserrat";
 	font-size: 1.2em;
 	padding: 0 1em;
-	margin-top: 1.3em;
 }
 
 #header input {
 	margin: 0.8em auto;
-	width: 30%;
-	height: 80%;
 	box-shadow: inset 0px 0px 4px 4px var(--color-light-shadow);
 	padding-left: 1em;
+	padding-right: 1em;
 	border: 1px solid var(--color-shadow);
 	background-color: #00000000;
 }
@@ -180,10 +184,6 @@ form {
 
 .theme_switch_light {
 	display: var(--light-visible-button);
-}
-
-.theme_switch_button {
-   	margin: 0.5em;
 }
 
 /********************** Pins *************************/
