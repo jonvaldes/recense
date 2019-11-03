@@ -278,6 +278,10 @@ fn index(req: HttpRequest<AppState>) -> actix_web::HttpResponse {
         .collect();
 
     let pin_count = pins.len();
+    let current_theme = match req.cookie("theme") {
+        Some(x) => String::from(x.value()),
+        None => String::new(),
+    };
     let index_data = json!({
         "username": username.clone(),
         "pins": pins,
@@ -286,6 +290,7 @@ fn index(req: HttpRequest<AppState>) -> actix_web::HttpResponse {
         "tags": tags,
         "logged_in": true,
         "elapsed_time": format!("{:.3}", chrono::Local::now().signed_duration_since(time_start).num_nanoseconds().unwrap() as f32 / 1e6f32),
+        "theme": current_theme,
     });
 
     let contents = match renderer.render_page("index", &index_data) {
@@ -306,6 +311,7 @@ fn markdown_page(
     template_name: &str,
     renderer: &htmlrenderer::HTMLRenderer,
     logged_in: bool,
+    current_theme: String,
 ) -> actix_web::HttpResponse {
     let markdown = match htmlrenderer::render_markdown_file(markdown_filename) {
         Err(err) => {
@@ -318,6 +324,7 @@ fn markdown_page(
     let markdown_data = json!({
         "markdown": markdown,
         "logged_in": logged_in,
+        "theme": current_theme,
     });
 
     let contents = match renderer.render_page(template_name, &markdown_data) {
@@ -337,16 +344,24 @@ fn todo(req: HttpRequest<AppState>) -> actix_web::HttpResponse {
     use std::borrow::Borrow;
     let renderer: &htmlrenderer::HTMLRenderer = req.state().html_renderer.borrow();
     let username = req.identity().unwrap_or(String::new());
+    let current_theme = match req.cookie("theme") {
+        Some(x) => String::from(x.value()),
+        None => String::new(),
+    };
 
-    markdown_page("TODO.md", "todo", renderer, username.len() > 0)
+    markdown_page("TODO.md", "todo", renderer, username.len() > 0, current_theme)
 }
 
 fn faq(req: HttpRequest<AppState>) -> actix_web::HttpResponse {
     use std::borrow::Borrow;
     let renderer: &htmlrenderer::HTMLRenderer = req.state().html_renderer.borrow();
     let username = req.identity().unwrap_or(String::new());
+    let current_theme = match req.cookie("theme") {
+        Some(x) => String::from(x.value()),
+        None => String::new(),
+    };
 
-    markdown_page("FAQ.md", "faq", renderer, username.len() > 0)
+    markdown_page("FAQ.md", "faq", renderer, username.len() > 0, current_theme)
 }
 
 fn static_files(req: HttpRequest<AppState>) -> actix_web::Result<NamedFile> {
@@ -433,9 +448,14 @@ fn edit_pin_page(
         Ok(x) => x,
     };
 
+    let current_theme = match req.cookie("theme") {
+        Some(x) => String::from(x.value()),
+        None => String::new(),
+    };
     let page_data = json!({
         "pin": pin,
         "logged_in": true,
+        "theme": current_theme,
     });
 
     let contents = match renderer.render_page("edit_pin", &page_data) {
