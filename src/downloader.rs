@@ -33,14 +33,14 @@ fn take_screenshot(req: &DownloadRequest) -> Result<(), Error> {
             e
         })?;
 
-    if output.stdout.len() > 0 {
+    if !output.stdout.is_empty() {
         info!(
             "Output from browser: {}",
             std::str::from_utf8(&output.stdout).unwrap_or("COULD NOT READ STDOUT")
         );
     }
 
-    if output.stderr.len() > 0 {
+    if !output.stderr.is_empty() {
         error!(
             "Errors from browser: {}",
             std::str::from_utf8(&output.stderr).unwrap_or("COULD NOT READ STDERR")
@@ -91,13 +91,13 @@ fn fix_html_references(handle: &mut html5ever::rcdom::Handle, server_url: &str) 
                 || name.local.eq_str_ignore_ascii_case("link")
             {
                 for attr in attrs.borrow_mut().iter_mut() {
-                    if attr.name.local.eq_str_ignore_ascii_case("href") {
-                        if String::from(attr.value.clone()).starts_with("/") {
-                            attr.value = html5ever::tendril::Tendril::format(format_args!(
-                                "{}{}",
-                                server_url, attr.value
-                            ));
-                        }
+                    if attr.name.local.eq_str_ignore_ascii_case("href")
+                        && attr.value.to_string().starts_with('/')
+                    {
+                        attr.value = html5ever::tendril::Tendril::format(format_args!(
+                            "{}{}",
+                            server_url, attr.value
+                        ));
                     }
                 }
             }

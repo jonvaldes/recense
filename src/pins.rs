@@ -48,7 +48,7 @@ impl BackingStore {
         let mut pin = pin;
 
         // Fix up url
-        if pin.urls.len() > 0 && pin.urls[0].len() > 0 {
+        if !pin.urls.is_empty() && !pin.urls[0].is_empty() {
             if !(pin.urls[0].starts_with("http://") || pin.urls[0].starts_with("https://")) {
                 pin.urls[0] = format!("http://{}", pin.urls[0]);
             }
@@ -71,7 +71,7 @@ impl BackingStore {
 
         std::fs::write(filename, &pin_json)?;
 
-        if pin.urls.len() > 0 {
+        if !pin.urls.is_empty() {
             self.in_channel
                 .send(DownloadRequest {
                     url: pin.urls[0].clone(),
@@ -127,7 +127,7 @@ impl BackingStore {
             });
 
         let mut result_vec: Vec<(String, usize)> =
-            result.iter().map(|(k, v)| (k.clone(), v.clone())).collect();
+            result.iter().map(|(k, v)| (k.clone(), *v)).collect();
         result_vec.sort_by(|a, b| a.0.cmp(&b.0));
 
         Ok(result_vec)
@@ -148,7 +148,7 @@ impl BackingStore {
                 }
                 let file = file.as_ref().unwrap();
                 let path = file.path();
-                let extension = path.as_path().extension().clone();
+                let extension = path.as_path().extension();
                 if extension.is_none() {
                     return false;
                 }

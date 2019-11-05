@@ -64,6 +64,13 @@ fn extract_theme(req: &HttpRequest<AppState>) -> Theme {
     Theme::Light
 }
 
+fn is_logged_in(req: &HttpRequest<AppState>) -> bool {
+    match req.identity() {
+        Some(username) => !username.is_empty(),
+        _ => false,
+    }
+}
+
 #[derive(Debug, Clone, Deserialize, Serialize)]
 struct PinInfo {
     title: Option<String>,
@@ -105,7 +112,7 @@ fn add_pin(
             .collect::<String>()
             .split_whitespace()
             .filter(|x| !x.is_empty())
-            .map(|x| String::from(x))
+            .map(String::from)
             .collect();
 
         // Deduplicate tags
@@ -187,7 +194,7 @@ fn edit_pin_data(
             .collect::<String>()
             .split_whitespace()
             .filter(|x| !x.is_empty())
-            .map(|x| String::from(x))
+            .map(String::from)
             .collect();
 
         // Deduplicate tags
@@ -227,7 +234,7 @@ fn login_screen(state: &AppState) -> actix_web::HttpResponse {
 fn index(req: HttpRequest<AppState>) -> actix_web::HttpResponse {
     let time_start = chrono::Local::now();
 
-    let username = req.identity().unwrap_or(String::new());
+    let username = req.identity().unwrap_or_default();
 
     if username == "" {
         return login_screen(req.state());
@@ -237,10 +244,10 @@ fn index(req: HttpRequest<AppState>) -> actix_web::HttpResponse {
     let renderer: &htmlrenderer::HTMLRenderer = req.state().html_renderer.borrow();
 
     let query = req.query();
-    let search_query = query.get("search");
 
-    let pins = if search_query.is_none() {
-        match req.state().storage.get_all_pins(&username) {
+    let search_query = query.get("search");
+    let pins = if let Some(search_query) = search_query {
+        match req.state().storage.search_pins(&username, &search_query) {
             Err(err) => {
                 error!("Err: {:?}", err);
                 return actix_web::HttpResponse::InternalServerError().finish();
@@ -248,11 +255,7 @@ fn index(req: HttpRequest<AppState>) -> actix_web::HttpResponse {
             Ok(x) => x,
         }
     } else {
-        match req
-            .state()
-            .storage
-            .search_pins(&username, &search_query.unwrap())
-        {
+        match req.state().storage.get_all_pins(&username) {
             Err(err) => {
                 error!("Err: {:?}", err);
                 return actix_web::HttpResponse::InternalServerError().finish();
@@ -297,7 +300,7 @@ fn index(req: HttpRequest<AppState>) -> actix_web::HttpResponse {
     let current_theme = extract_theme(&req);
 
     let index_data = json!({
-        "username": username.clone(),
+        "username": username,
         "pins": pins,
         "pin_count": pin_count,
         "search_term": search_query.unwrap_or(&String::new()),
@@ -357,25 +360,27 @@ fn markdown_page(
 fn todo(req: HttpRequest<AppState>) -> actix_web::HttpResponse {
     use std::borrow::Borrow;
     let renderer: &htmlrenderer::HTMLRenderer = req.state().html_renderer.borrow();
-    let username = req.identity().unwrap_or(String::new());
-    let current_theme = extract_theme(&req);
 
     markdown_page(
         "TODO.md",
         "todo",
         renderer,
-        username.len() > 0,
-        current_theme,
+        is_logged_in(&req),
+        extract_theme(&req),
     )
 }
 
 fn faq(req: HttpRequest<AppState>) -> actix_web::HttpResponse {
     use std::borrow::Borrow;
     let renderer: &htmlrenderer::HTMLRenderer = req.state().html_renderer.borrow();
-    let username = req.identity().unwrap_or(String::new());
-    let current_theme = extract_theme(&req);
 
-    markdown_page("FAQ.md", "faq", renderer, username.len() > 0, current_theme)
+    markdown_page(
+        "FAQ.md",
+        "faq",
+        renderer,
+        is_logged_in(&req),
+        extract_theme(&req),
+    )
 }
 
 fn static_files(req: HttpRequest<AppState>) -> actix_web::Result<NamedFile> {
@@ -387,7 +392,7 @@ fn static_files(req: HttpRequest<AppState>) -> actix_web::Result<NamedFile> {
 }
 
 fn download_archive(req: HttpRequest<AppState>) -> actix_web::HttpResponse {
-    let username = req.identity().unwrap_or(String::new());
+    let username = req.identity().unwrap_or_default();
 
     if username == "" {
         return actix_web::HttpResponse::SeeOther()
@@ -443,7 +448,7 @@ fn edit_pin_page(
     req: HttpRequest<AppState>,
     path: actix_web::Path<String>,
 ) -> actix_web::HttpResponse {
-    let username = req.identity().unwrap_or(String::new());
+    let username = req.identity().unwrap_or_default();
 
     if username == "" {
         return actix_web::HttpResponse::SeeOther()
@@ -581,7 +586,7 @@ fn generate_cookie_key(filename: &str) -> Vec<u8> {
         let mut cookie_key = vec![0u8; 32];
 
         let timestamp = chrono::Utc::now().timestamp_nanos();
-        rand_pcg::Mcg128Xsl64::new(0x1337f00dd15ea5e5u128 + timestamp as u128)
+        rand_pcg::Mcg128Xsl64::new(0x1337_f00d_d15e_a5e5u128 + timestamp as u128)
             .fill_bytes(&mut cookie_key);
         cookie_key
     };

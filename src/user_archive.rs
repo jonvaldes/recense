@@ -21,12 +21,12 @@ pub fn generate_archive_for_user(username: String) -> Result<Vec<u8>, Error> {
         zip.add_directory("recense_user_archive", file_options)?;
 
         for file in std::fs::read_dir(dir_path)? {
-            if !file.is_ok() {
+            if file.is_err() {
                 continue;
             }
             let file = file.as_ref().unwrap();
             let path = file.path();
-            let filename_opt = path.as_path().file_name().clone();
+            let filename_opt = path.as_path().file_name();
 
             if filename_opt.is_none() {
                 continue;

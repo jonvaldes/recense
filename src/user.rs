@@ -16,7 +16,7 @@ impl UserInfo {
         use chrono::prelude::*;
         let timestamp = Utc::now().timestamp_nanos();
 
-        rand_pcg::Mcg128Xsl64::new(0xcafef00dd15ea5e5 + timestamp as u128)
+        rand_pcg::Mcg128Xsl64::new(0xcafe_f00d_d15e_a5e5 + timestamp as u128)
             .fill_bytes(&mut password_salt);
 
         let hash_session = argon2rs::verifier::Encoded::new(
@@ -35,7 +35,7 @@ impl UserInfo {
             .chars()
             .all(|c| c.is_ascii_alphanumeric() || c == '-' || c == '_' || c == '.');
 
-        ensure!(username.len() > 0, "User name cannot be empty");
+        ensure!(!username.is_empty(), "User name cannot be empty");
         ensure!(all_chars_ok, "Username contains invalid characters");
         ensure!(
             !UserInfo::user_dir(&username).exists(),
