@@ -59,7 +59,8 @@ body.dark-theme {
 	--light-visible-button: none;
 }
 
-input#add_pin_switch:checked ~ #top_div {
+
+input#add_pin_switch.dark-theme-switch ~ #top_div {
 	--add-pin-visible: block;
 }
 

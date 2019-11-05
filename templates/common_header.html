@@ -4,33 +4,12 @@
 		<link rel="icon" type="image/png" href="/static/favicon.png">
   		<link rel="stylesheet" href="/static/fontawesome.min.css" rel="stylesheet">
 		<link rel="stylesheet" type="text/css" href="/static/style.css">
-		<script>
-			function readCookie(name) {
-				var nameEQ = name + "=";
-				var ca = document.cookie.split(';');
-				for(var i=0;i < ca.length;i++) {
-					var c = ca[i];
-					while (c.charAt(0)==' ') c = c.substring(1,c.length);
-					if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
-				}
-				return null;
-			}
-
-			function checkThemeSwitch(){ 
-				if(readCookie("theme") == "dark") {
-					document.getElementById("theme_switch").checked = true;
-				}
-			}
-		</script>
 	</head>
 	<body class="{{theme}}-theme">
 		<!-- Invisible checkboxes to toggle features in the website-->
-		<input type="checkbox" id="theme_switch" style="display:none"/>
+		<input class="{{theme}}-theme-switch" type="checkbox" id="theme_switch" style="display:none"/>
 		<input type="checkbox" id="add_pin_switch" style="display:none"/>
 		<!-- ^^^^^ -->
-		<script>
-			checkThemeSwitch();
-		</script>
 		<div id="top_div">
 			<div id="header">
 				<a href="/" class="logo">Recen.se</a>

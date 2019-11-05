@@ -48,6 +48,22 @@ impl AppState {
     }
 }
 
+#[derive(Serialize)]
+#[serde(rename_all = "lowercase")]
+enum Theme {
+    Dark,
+    Light,
+}
+    
+fn extract_theme(req: &HttpRequest<AppState>) -> Theme {
+    if let Some(cookie) = req.cookie("theme") {
+        if cookie.value() == "dark" {
+            return Theme::Dark;
+        }
+    }
+    Theme::Light
+}
+
 #[derive(Debug, Clone, Deserialize, Serialize)]
 struct PinInfo {
     title: Option<String>,
@@ -278,10 +294,8 @@ fn index(req: HttpRequest<AppState>) -> actix_web::HttpResponse {
         .collect();
 
     let pin_count = pins.len();
-    let current_theme = match req.cookie("theme") {
-        Some(x) => String::from(x.value()),
-        None => String::new(),
-    };
+    let current_theme = extract_theme(&req);
+
     let index_data = json!({
         "username": username.clone(),
         "pins": pins,
@@ -311,7 +325,7 @@ fn markdown_page(
     template_name: &str,
     renderer: &htmlrenderer::HTMLRenderer,
     logged_in: bool,
-    current_theme: String,
+    current_theme: Theme,
 ) -> actix_web::HttpResponse {
     let markdown = match htmlrenderer::render_markdown_file(markdown_filename) {
         Err(err) => {
@@ -344,10 +358,7 @@ fn todo(req: HttpRequest<AppState>) -> actix_web::HttpResponse {
     use std::borrow::Borrow;
     let renderer: &htmlrenderer::HTMLRenderer = req.state().html_renderer.borrow();
     let username = req.identity().unwrap_or(String::new());
-    let current_theme = match req.cookie("theme") {
-        Some(x) => String::from(x.value()),
-        None => String::new(),
-    };
+    let current_theme = extract_theme(&req);
 
     markdown_page("TODO.md", "todo", renderer, username.len() > 0, current_theme)
 }
@@ -356,10 +367,7 @@ fn faq(req: HttpRequest<AppState>) -> actix_web::HttpResponse {
     use std::borrow::Borrow;
     let renderer: &htmlrenderer::HTMLRenderer = req.state().html_renderer.borrow();
     let username = req.identity().unwrap_or(String::new());
-    let current_theme = match req.cookie("theme") {
-        Some(x) => String::from(x.value()),
-        None => String::new(),
-    };
+    let current_theme = extract_theme(&req);
 
     markdown_page("FAQ.md", "faq", renderer, username.len() > 0, current_theme)
 }
