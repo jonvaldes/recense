@@ -33,7 +33,8 @@
 	margin: 1em;
 }
 
-#top_div {
+/* Defaults for the default, light theme */
+body {
 	--background-color:#fff;
 	--color:#000;
 	--color-a:#339;
@@ -42,13 +43,14 @@
 	--color-shadow: #aaa;
 	--dark-visible-button: none;
 	--light-visible-button: inherit;
+
 	--add-pin-visible: none;
 	--header-height: 3.8em;
 }
 
-input#theme_switch:checked ~ #top_div{
-	--color:#f7f7f7;
+body.dark-theme {
 	--background-color: #222;
+	--color:#f7f7f7;
 	--color-a:#b7b7ff;
 	--color-a-visited:#d7d7d7;
 	--color-light-shadow: #171717;
@@ -107,12 +109,9 @@ input, textarea {
 	border-radius: 2px;
 }
 
-.contents {
-	min-height:100vh;
+body {
 	color: var(--color);
-	height: auto;
-	padding-bottom: 90px;
-	background-color:var(--background-color);
+	background-color: var(--background-color);
 }
 
 .markdown_content {
