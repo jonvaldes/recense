@@ -5,7 +5,7 @@ pub trait Context<T, E> {
         F: FnOnce() -> C;
 }
 
-impl<T, E> Context<T,E> for ::std::result::Result<T, E>
+impl<T, E> Context<T, E> for ::std::result::Result<T, E>
 where
     E: failure::Fail,
 {

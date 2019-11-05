@@ -26,8 +26,8 @@ use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 use std::rc::Rc;
 
-mod errors;
 mod downloader;
+mod errors;
 mod htmlrenderer;
 mod pins;
 mod user;
@@ -54,7 +54,7 @@ enum Theme {
     Dark,
     Light,
 }
-    
+
 fn extract_theme(req: &HttpRequest<AppState>) -> Theme {
     if let Some(cookie) = req.cookie("theme") {
         if cookie.value() == "dark" {
@@ -360,7 +360,13 @@ fn todo(req: HttpRequest<AppState>) -> actix_web::HttpResponse {
     let username = req.identity().unwrap_or(String::new());
     let current_theme = extract_theme(&req);
 
-    markdown_page("TODO.md", "todo", renderer, username.len() > 0, current_theme)
+    markdown_page(
+        "TODO.md",
+        "todo",
+        renderer,
+        username.len() > 0,
+        current_theme,
+    )
 }
 
 fn faq(req: HttpRequest<AppState>) -> actix_web::HttpResponse {
@@ -422,7 +428,9 @@ fn page_cache(req: HttpRequest<AppState>) -> actix_web::Result<NamedFile> {
     let path: PathBuf = req.match_info().query("path")?;
     let actual_path = format!("cache/{}", path.as_path().to_str().unwrap());
     if !std::path::Path::new(&actual_path).exists() {
-        return Err(actix_web::error::ErrorNotFound(failure::err_msg("File not found")));
+        return Err(actix_web::error::ErrorNotFound(failure::err_msg(
+            "File not found",
+        )));
     }
 
     Ok(NamedFile::open(format!(
@@ -610,19 +618,18 @@ fn get_cookie_key() -> Vec<u8> {
 }
 
 fn main() {
-
     // Configure logger at runtime
     fern::Dispatch::new()
         .format(|out, message, record| {
             out.finish(format_args!(
-                    "{}[{}][{}] {}",
-                    chrono::Local::now().format("[%Y-%m-%d][%H:%M:%S]"),
-                    record.target(),
-                    record.level(),
-                    message
+                "{}[{}][{}] {}",
+                chrono::Local::now().format("[%Y-%m-%d][%H:%M:%S]"),
+                record.target(),
+                record.level(),
+                message
             ))
         })
-    .level(log::LevelFilter::Debug)
+        .level(log::LevelFilter::Debug)
         .level_for("handlebars", log::LevelFilter::Error)
         .level_for("html5ever", log::LevelFilter::Error)
         .level_for("actix_web", log::LevelFilter::Error)

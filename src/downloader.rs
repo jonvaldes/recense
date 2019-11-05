@@ -1,7 +1,7 @@
+use crate::errors::Context;
 use actix_web::http;
 use failure::Error;
 use std::sync::mpsc;
-use crate::errors::Context;
 
 pub struct DownloadRequest {
     pub url: String,
@@ -34,12 +34,17 @@ fn take_screenshot(req: &DownloadRequest) -> Result<(), Error> {
         })?;
 
     if output.stdout.len() > 0 {
-        info!("Output from browser: {}", std::str::from_utf8(&output.stdout).unwrap_or("COULD NOT READ STDOUT"));
+        info!(
+            "Output from browser: {}",
+            std::str::from_utf8(&output.stdout).unwrap_or("COULD NOT READ STDOUT")
+        );
     }
 
-
     if output.stderr.len() > 0 {
-        error!("Errors from browser: {}", std::str::from_utf8(&output.stderr).unwrap_or("COULD NOT READ STDERR"));
+        error!(
+            "Errors from browser: {}",
+            std::str::from_utf8(&output.stderr).unwrap_or("COULD NOT READ STDERR")
+        );
     }
 
     // Move screenshot.png to the right place
@@ -169,11 +174,13 @@ pub fn downloader_thread(channel: mpsc::Receiver<DownloadRequest>) {
         "/usr/bin/chromium",
         "/usr/bin/chromium-browser",
     ]
-        .iter()
-        .find(|browser| std::path::Path::new(&browser).exists())
-        .ok_or_else(|| panic!("Could not find any installed chromium-based browser to take screenshots of sites"))
-        .unwrap();
-    
+    .iter()
+    .find(|browser| std::path::Path::new(&browser).exists())
+    .ok_or_else(|| {
+        panic!("Could not find any installed chromium-based browser to take screenshots of sites")
+    })
+    .unwrap();
+
     loop {
         let download_request = channel.recv().unwrap();
 
@@ -188,7 +195,11 @@ pub fn downloader_thread(channel: mpsc::Receiver<DownloadRequest>) {
         }
 
         if let Err(err) = download_link_source(&active_browser, &download_request) {
-            error!("Error trying to download source: {}\n{}", err, err.backtrace())
+            error!(
+                "Error trying to download source: {}\n{}",
+                err,
+                err.backtrace()
+            )
         }
     }
 }
