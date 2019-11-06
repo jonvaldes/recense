@@ -81,29 +81,26 @@ fn take_screenshot(req: &DownloadRequest) -> Result<(), Error> {
 
 fn fix_html_references(handle: &mut html5ever::rcdom::Handle, server_url: &str) {
     let node = handle;
-    match node.data {
-        html5ever::rcdom::NodeData::Element {
-            ref name,
-            ref attrs,
-            ..
-        } => {
-            if name.local.eq_str_ignore_ascii_case("a")
-                || name.local.eq_str_ignore_ascii_case("link")
-            {
-                for attr in attrs.borrow_mut().iter_mut() {
-                    if attr.name.local.eq_str_ignore_ascii_case("href")
-                        && attr.value.to_string().starts_with('/')
-                    {
-                        attr.value = html5ever::tendril::Tendril::format(format_args!(
-                            "{}{}",
-                            server_url, attr.value
-                        ));
-                    }
+
+    if let html5ever::rcdom::NodeData::Element {
+        ref name,
+        ref attrs,
+        ..
+    } = node.data
+    {
+        if name.local.eq_str_ignore_ascii_case("a") || name.local.eq_str_ignore_ascii_case("link") {
+            for attr in attrs.borrow_mut().iter_mut() {
+                if attr.name.local.eq_str_ignore_ascii_case("href")
+                    && attr.value.to_string().starts_with('/')
+                {
+                    attr.value = html5ever::tendril::Tendril::format(format_args!(
+                        "{}{}",
+                        server_url, attr.value
+                    ));
                 }
             }
         }
-        _ => (),
-    }
+    };
 
     for mut child in node.children.borrow_mut().iter_mut() {
         fix_html_references(&mut child, server_url);

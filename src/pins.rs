@@ -48,9 +48,11 @@ impl BackingStore {
         let mut pin = pin;
 
         // Fix up url
-        if !pin.urls.is_empty() && !pin.urls[0].is_empty() {
-            if !(pin.urls[0].starts_with("http://") || pin.urls[0].starts_with("https://")) {
-                pin.urls[0] = format!("http://{}", pin.urls[0]);
+        if let Some(url) = pin.urls.first_mut() {
+            let is_url_ok =
+                url.is_empty() || url.starts_with("http://") || url.starts_with("https://");
+            if !is_url_ok {
+                *url = format!("http://{}", url);
             }
         }
 
