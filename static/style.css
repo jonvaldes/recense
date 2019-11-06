@@ -60,7 +60,7 @@ body.dark-theme {
 }
 
 
-input#add_pin_switch.dark-theme-switch ~ #top_div {
+input#add_pin_switch:checked ~ #top_div {
 	--add-pin-visible: block;
 }
 
@@ -339,6 +339,10 @@ body {
 	margin-left: -1em;
 	margin-top: auto;
 	margin-bottom: auto;
+}
+
+.add_pin_switch_button {
+	cursor: pointer;
 }
 
 /********************** Edit Pin Form *************************/
