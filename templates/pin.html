@@ -1,7 +1,7 @@
 <div class="pin">
-	<img src="/cache/{{../username}}/{{id}}.jpg" alt=" "></img>
 
 	<a tabindex="1" class="pin_title" target="_blank" rel="noopener noreferrer" href="{{#if (is_empty_string (lookup urls 0))}}view/{{id}}{{else}}{{lookup urls 0}}{{/if}}">
+		<img src="/cache/{{../username}}/{{id}}.jpg" alt=" "></img>
 		{{#if (is_empty_string title)}}
 			{{lookup urls 0}}
 		{{else}}
